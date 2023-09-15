@@ -11,11 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
-import java.util.HashMap;
-
 @Configuration
-public class RabbitMQConfig {
+public class RabbitConfig {
 
     @Value("${spring.rabbitmq.host}")
     private String host;
@@ -28,40 +25,6 @@ public class RabbitMQConfig {
 
     @Value("${spring.rabbitmq.password}")
     private String pw;
-
-    @Value("${spring.rabbitmq.template.exchange}")
-    private String exchange;
-
-    @Value("${spring.rabbitmq.template.default-receive-queue}")
-    private String queue;
-
-    @Value("${spring.rabbitmq.template.routing-key}")
-    private String key;
-
-//    // Topic 타입의 Exchange 생성
-//    @Bean
-//    public Exchange exchange() { return new TopicExchange(exchange); }
-//
-//    // Quorum Queue 생성
-//    @Bean
-//    public Queue queue() {
-//        // Queue 타입, Arguments 설정
-//        Map<String, Object> args = new HashMap<>();
-//        args.put("x-queue-type", "quorum");
-//        args.put("x-message-ttl", 200000);
-//
-//
-//        return QueueBuilder.durable(queue).withArguments(args).build();
-//    }
-//
-//    // Exchange <-> Queue Binding
-//    @Bean
-//    public Binding binding(Queue queue, Exchange exchange) {
-//        Map<String, Object> args = new HashMap<>();
-//        args.put("x-message-ttl", 200000);
-//
-//        return BindingBuilder.bind(queue).to(exchange).with(key).and(args);
-//    }
 
     // Message Converter Bean 주입
     @Bean
