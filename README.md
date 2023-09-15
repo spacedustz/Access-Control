@@ -54,4 +54,4 @@
 ---
 
 ## 시퀀스 다이어그램
-![시퀀스 다이어그램](https://github.com/spacedustz/Access-Control/blob/main/img/Diagram.png)
+![시퀀스 다이어그램](https://github.com/spacedustz/Access-Control/blob/main/Description/Diagram.png)
