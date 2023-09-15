@@ -3,6 +3,7 @@ server:
     encoding:
       charset: UTF-8
       force-response: true
+  port: 3001
 
 spring:
   # H2 설정
