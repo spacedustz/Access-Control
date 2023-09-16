@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitConfig {
-
     @Value("${spring.rabbitmq.host}")
     private String host;
 
