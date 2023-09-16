@@ -32,24 +32,13 @@
 ---
 
 ## 기술 스택
-
-**백엔드**
 - Spring Batch
 - Spring Web
 - Spring Data JPA
 - Lombok
 - WebSocket (STOMP)
 - RabbitMQ (AMQP)
-- MariaDB (version: 11.1.2)
-
-<br>
-
-**프론트엔드**
-- React
-- TypeScript
-- Stomp
-- Zustand
-- Styled-Component
+- H2
 
 ---
 
