@@ -14,18 +14,24 @@ import java.time.LocalDateTime;
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Count {
+public class Event {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long count;
+    @Setter
+    private int count = 0;
     private LocalDateTime eventTime;
 
-    private Count(Long count, LocalDateTime eventTime) {
-        this.count = count;
+    private Event(LocalDateTime eventTime) {
         this.eventTime = eventTime;
     }
 
-    public static Count createOf(Long count, LocalDateTime eventTime) {
-        return new Count(count, eventTime);
+    // 생성자 - 정적 팩토리 함수
+    public static Event createOf(LocalDateTime eventTime) {
+        return new Event(eventTime);
+    }
+
+    // 하루가 지날때 마다 count 수 초기화
+    public void initializeCount() {
+        this.count = 0;
     }
 }
