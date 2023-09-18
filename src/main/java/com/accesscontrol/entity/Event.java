@@ -18,7 +18,11 @@ public class Event {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Setter
-    private int count = 0;
+    private int inCount = 0;
+
+    @Setter
+    private int outCount = 0;
+
     private LocalDateTime eventTime;
 
     private Event(LocalDateTime eventTime) {
@@ -32,6 +36,7 @@ public class Event {
 
     // 하루가 지날때 마다 count 수 초기화
     public void initializeCount() {
-        this.count = 0;
+        this.inCount = 0;
+        this.outCount = 0;
     }
 }
