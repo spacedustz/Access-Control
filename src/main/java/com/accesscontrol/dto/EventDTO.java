@@ -16,6 +16,6 @@ public class EventDTO {
 
     @Getter
     public static class Extra {
-        private int count;
+        private String crossing_direction;
     }
 }
