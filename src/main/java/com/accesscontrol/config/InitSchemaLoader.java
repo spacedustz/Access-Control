@@ -7,12 +7,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 /**
  * @author: 신건우
@@ -27,11 +29,16 @@ public class InitSchemaLoader implements ApplicationRunner {
 
     private final EventRepository eventRepository;
 
+    @Cacheable("entityCount")
+    public Long getEntityCount() {
+        return eventRepository.count();
+    }
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
         // 테이블에 데이터 수 확인
-        long objectCount = eventRepository.count();
+        long objectCount = getEntityCount();
 
         // DB에 데이터가 하나도 없으면 초기 데이터 생성
         if (objectCount == 0) {
@@ -54,7 +61,7 @@ public class InitSchemaLoader implements ApplicationRunner {
 
             Event storedEvent = null;
             try {
-                storedEvent = eventRepository.findById(1L).orElse(null);
+                storedEvent = eventRepository.findById(getEntityCount()).orElse(null);
             } catch (Exception e) {
                 log.error("기존에 존재하는 데이터 조회 실패 - Event ID : {}", storedEvent.getId(), e);
                 throw new CommonException("INIT-002", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -75,7 +82,7 @@ public class InitSchemaLoader implements ApplicationRunner {
                     throw new CommonException("INIT-003", HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             } else {
-                log.info("현재 날짜의 데이터가 이미 존재합니다, 객체 생성 중지 - 현재 데이터의 날짜 : {}", storedEvent.getEventTime().format(formatter));
+                log.info("현재 날짜의 데이터가 이미 존재합니다, 객체 생성 중지 - 현재 데이터의 날짜 : {}, ID : {}", storedEvent.getEventTime().format(formatter), storedEvent.getId());
             }
         }
     }
