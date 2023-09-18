@@ -251,21 +251,48 @@ public class RabbitTopicListener {
   
     private EventRepository eventRepository;  
   
+    @Cacheable("entityCount")  
+    public Long getEntityCount() {  
+        return eventRepository.count();  
+    }  
+  
     // MQTT 데이터에서 들어오는 system_date의 날짜 형식은 "EEE MMM dd HH:mm:ss yyyy" 입니다.  
     // 이 String 타입 날짜 데이터를 "년-월-일T시-분-초"의 LocalDateTime으로 변환해서 엔티티화 합니다.  
     @RabbitListener(queues = "q.frame")  
     public void receive(EventDTO message) {  
-        log.info("원본 Date: " + message.getSystem_date());  
+        log.info("원본 Date: {}", message.getSystem_date());  
         log.info("원본 Count: " + message.getEvents().stream().map(it -> it.getExtra().getCrossing_direction()).toList());  
+  
+        String direction = message.getEvents().stream().map(it -> it.getExtra().getCrossing_direction()).toList().get(0);  
+        log.info("Direction: {}", direction);  
   
         // 원본 데이터의 system_date 필드 변환  
         String originalDate = message.getSystem_date();  
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:s yyyy", Locale.ENGLISH);  
         LocalDateTime convertedDate = LocalDateTime.parse(originalDate, formatter);  
-        log.info("날짜 타입 변환 테스트 : " + convertedDate);  
-          
+  
+        // 년월일, 시분초 변환기  
+        DateTimeFormatter YMDFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+        DateTimeFormatter HMFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+  
+        Event event = eventRepository.findById(getEntityCount()).orElse(null);  
+  
+        // DB에 저장된 데이터의 날짜 나누기  
+        String entityYMDDate = event.getEventTime().format(YMDFormatter);  
+        String entityHMDate = event.getEventTime().format(HMFormatter);  
+  
+        // 이벤트로 넘어온 데이터의 날짜 나누기  
+        String eventYMDDate = convertedDate.format(YMDFormatter);  
+        String eventHMDate = convertedDate.format(HMFormatter);  
+  
+        message.getEvents().stream().map(it -> it.getExtra().getCrossing_direction()).toList();  
+  
+        // 현재 Entity와 이벤트로 넘어온 년월일, 운영 시간일때만 Door Open        if (entityYMDDate.equals(eventYMDDate) && entityHMDate.equals(eventHMDate)) {  
+        }  
+  
+  
     }  
-} 
+}
 ```  
 
 <br>
@@ -293,11 +320,17 @@ public class InitSchemaLoader implements ApplicationRunner {
   
     private final EventRepository eventRepository;  
   
+    @Cacheable("entityCount")  
+    public Long getEntityCount() {  
+        return eventRepository.count();  
+    }  
+  
     @Override  
     public void run(ApplicationArguments args) throws Exception {  
   
         // 테이블에 데이터 수 확인  
-        long objectCount = eventRepository.count();  
+        long objectCount = getEntityCount();  
+        log.info("데이터 수 : {}", objectCount);  
   
         // DB에 데이터가 하나도 없으면 초기 데이터 생성  
         if (objectCount == 0) {  
@@ -320,7 +353,7 @@ public class InitSchemaLoader implements ApplicationRunner {
   
             Event storedEvent = null;  
             try {  
-                storedEvent = eventRepository.findById(1L).orElse(null);  
+                storedEvent = eventRepository.findById(getEntityCount()).orElse(null);  
             } catch (Exception e) {  
                 log.error("기존에 존재하는 데이터 조회 실패 - Event ID : {}", storedEvent.getId(), e);  
                 throw new CommonException("INIT-002", HttpStatus.INTERNAL_SERVER_ERROR);  
@@ -341,7 +374,7 @@ public class InitSchemaLoader implements ApplicationRunner {
                     throw new CommonException("INIT-003", HttpStatus.INTERNAL_SERVER_ERROR);  
                 }  
             } else {  
-                log.info("현재 날짜의 데이터가 이미 존재합니다, 객체 생성 중지 - 현재 데이터의 날짜 : {}", storedEvent.getEventTime().format(formatter));  
+                log.info("현재 날짜의 데이터가 이미 존재합니다, 객체 생성 중지 - 현재 데이터의 날짜 : {}, ID : {}", storedEvent.getEventTime().format(formatter), storedEvent.getId());  
             }  
         }  
     }  
