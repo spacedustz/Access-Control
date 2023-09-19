@@ -1,4 +1,4 @@
-> 📘 **InitSchemaLoader : 초기 데이터 설정**
+> 📘 **InitDataSchedule : 초기 데이터 설정**
 
 매일 00시 00분 01초에 Scehdule을 이용하여 매일 00시 00분에, 테이블에 현재 날짜 값을 가진 데이터가 없으면,
 
