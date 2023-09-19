@@ -1,5 +1,9 @@
 > 📘 **InitSchemaLoader : 초기 데이터 설정**
 
+매일 00시 00분 01초에 Scehdule을 이용하여 매일 00시 00분에, 테이블에 현재 날짜 값을 가진 데이터가 없으면,
+
+자동으로 현재 날짜의 데이터를 생성하게 하는 클래스입니다.
+
 * 첫번째 if 문 : DB에 데이터가 하나도 없으면 초기 데이터 생성
 * 두번째 if 문 : DB에 객체가 1개 이상이고, 데이터의 날짜가 `오늘 날짜가 아닐 때` 오늘 날짜에 해당하는 객체 새로 생성
 
@@ -13,7 +17,7 @@
 @Slf4j  
 @Component  
 @RequiredArgsConstructor  
-public class InitSchemaLoader implements ApplicationRunner {  
+public class InitSchemaLoader {  
   
     private final EventRepository eventRepository;  
   
@@ -22,12 +26,16 @@ public class InitSchemaLoader implements ApplicationRunner {
         return eventRepository.count();  
     }  
   
-    @Override  
-    public void run(ApplicationArguments args) throws Exception {  
+    @Scheduled(cron = "1 0 0 * * *", zone = "Asia/Seoul")  
+    public void scheduleTask() throws Exception {  
+        addData();  
+        log.info("데이터 생성 태스크 실행 - 시간 : {}", LocalDateTime.now());  
+    }  
+  
+    public void addData() throws Exception {  
   
         // 테이블에 데이터 수 확인  
         long objectCount = getEntityCount();  
-        log.info("데이터 수 : {}", objectCount);  
   
         // DB에 데이터가 하나도 없으면 초기 데이터 생성  
         if (objectCount == 0) {  
