@@ -65,6 +65,8 @@
 ---
 ## 구현
 
-- [Setting, Entity, DTO](https://github.com/spacedustz/Access-Control/blob/main/Description/Setting.md)
-- [데이터 생성 Schedule Task](https://github.com/spacedustz/Access-Control/blob/main/Description/Init-Data.md)
+- [Yaml Setting](https://github.com/spacedustz/Access-Control/blob/main/Description/Yaml.md)
+- [Rabbit Config Setting](https://github.com/spacedustz/Access-Control/blob/main/Description/Rabbit.md)
+- [데이터를 담을 DTO, Entity 설계](https://github.com/spacedustz/Access-Control/blob/main/Description/Entity.md)
+- [초기 데이터 생성, 주기적인 Schedule Task 작업](https://github.com/spacedustz/Access-Control/blob/main/Description/Init-Data.md)
 - [MQTT -> Rabbit -> Spring으로 넘어온 데이터 필터링](https://github.com/spacedustz/Access-Control/blob/main/Description/Listener.md)
