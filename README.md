@@ -15,30 +15,26 @@
 2. 사람 출입 시 딥러닝 엔진에서 이벤트 발생 (TripWire Crossing)
 3. 영상에서 나온 MQTT 이벤트 데이터를 RabbitMQ의 Exchange를 거쳐 맞는 Routing Key를 가진 Quorum Queue로 데이터 쌓기
 4. Quorum Queue에 쌓인 데이터를 Spring에서 가져와 필요한 필드(count 등)을 뽑아 엔티티화 -> DB 저장
-5. Restful API & WebSocket을 통해 프론트엔드로 데이터 전달
+5. Restful API & WebSocket을 통해 Spring Web에서 js 전달
 6. 프론트엔드에서 데이터를 받아 현재 방안의 인원을 State로 만들어 실시간으로 인원수를 카운팅 합니다.
 
-<br>
-
-**구현 조건**
 - 출입 시간 <-> 현재 시간 비교해서 영업 시간이 아닌 경우 Event Trigger 중지, Door 오픈 X
 - 운영 시간이 아닐때 Batch 작업 중지, UI에 영업중단 표시, 자동문 API에 문열림 방지 Request 보내기
 - "운영 시간이 아닐 시" DB내 현재 Count Reset
 - 15명 이상일때 `만실입니다.` 로 표시- 재실 인원 보정 변수 고장 남
 - 운영 시간이 아닐 때 `현재는 운영 시간이 아닙니다.` 로 표시
-- Tripwire Direction In/Out별 Count 수 집계
+- Tripwire Direction In/Out별 Count 수 내부 집계 후 Occupancy(현재 방 인원) 값 계산
 
 
 ---
 
 ## 기술 스택
-- Spring Batch
-- Spring Web
+- Spring Web (방 내부의 인원수, 최대 수용 인원, 현재 방 상태 등 UI 출력)
 - Spring Data JPA
 - Lombok
 - WebSocket (STOMP)
 - RabbitMQ (AMQP)
-- H2
+- H2 (Embedded Mode 사용)
 
 ---
 
