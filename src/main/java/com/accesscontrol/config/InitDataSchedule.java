@@ -5,6 +5,8 @@ import com.accesscontrol.error.CommonException;
 import com.accesscontrol.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,7 +25,7 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class InitDataSchedule {
+public class InitDataSchedule implements ApplicationRunner {
 
     private final EventRepository eventRepository;
 
@@ -42,21 +44,6 @@ public class InitDataSchedule {
 
         // 테이블에 데이터 수 확인
         long objectCount = getEntityCount();
-
-        // DB에 데이터가 하나도 없으면 초기 데이터 생성
-        if (objectCount == 0) {
-            log.info("Event Table 내부에 데이터가 없습니다. 객체를 생성합니다.");
-
-            Event event = Event.createOf(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
-
-            try {
-                eventRepository.save(event);
-                log.info("객체 생성 완료, Event ID: {}", event.getId());
-            } catch (Exception e) {
-                log.error("객체 생성 실패", e);
-                throw new CommonException("INIT-001", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
 
         // DB에 데이터가 1개 이상이고, 그 데이터의 현재 년월일이 현재 년월일과 맞지 않으면 새로운 객체 생성
         if (objectCount > 0) {
@@ -86,6 +73,28 @@ public class InitDataSchedule {
                 }
             } else {
                 log.info("현재 날짜의 데이터가 이미 존재합니다, 객체 생성 중지 - 현재 데이터의 날짜 : {}, ID : {}", storedEvent.getEventTime().format(formatter), storedEvent.getId());
+            }
+        }
+    }
+
+    // Spring 서버 재시작 할때, DB에 데이터가 하나도 없을때 초기 데이터 1개 생성
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        // 테이블에 데이터 수 확인
+        long objectCount = getEntityCount();
+
+        // DB에 데이터가 하나도 없으면 초기 데이터 생성
+        if (objectCount == 0) {
+            log.info("Event Table 내부에 데이터가 없습니다. 객체를 생성합니다.");
+
+            Event event = Event.createOf(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
+
+            try {
+                eventRepository.save(event);
+                log.info("객체 생성 완료, Event ID: {}", event.getId());
+            } catch (Exception e) {
+                log.error("객체 생성 실패", e);
+                throw new CommonException("INIT-001", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }
