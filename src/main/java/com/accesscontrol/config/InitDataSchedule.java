@@ -19,8 +19,8 @@ import java.time.format.DateTimeFormatter;
 /**
  * @author: 신건우
  * @desc
- * 첫번째 if 문 : DB에 데이터가 하나도 없으면 초기 데이터 컬럼 생성
- * 두번째 if 문 : DB에 객체가 1개 이상이고, 데이터의 날짜가 오늘 날짜가 아닐때 오늘 날짜에 해당하는 객체 새로 생성
+ * run() 함수 : Spring 어플리케이션 시작 시, DB에 데이터가 하나도 없으면 초기 데이터 컬럼 생성
+ * addData() 함수 : DB에 객체가 1개 이상이고, 데이터의 날짜가 오늘 날짜가 아닐때 오늘 날짜에 해당하는 객체 새로 생성
  */
 @Slf4j
 @Component
