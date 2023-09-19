@@ -17,7 +17,7 @@
 @Slf4j  
 @Component  
 @RequiredArgsConstructor  
-public class InitSchemaLoader {  
+public class InitDataSchedule {  
   
     private final EventRepository eventRepository;  
   
