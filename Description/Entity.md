@@ -40,6 +40,13 @@ MaxCount : 입장 가능한 최대 인원 수 (단순히 화면에 출력될 값
 relayUrl : Door API의 URL
 state : 현재 인원에 따라 내부의 상태를 출력할 값
 
+<br>
+
+**@EntityListeners(WebSocketEntityListener.class)**
+- 엔티티의 값 변화 이벤트를 트리거로 사용해서, 웹 브라우저에 소켓으로 변화된 데이터값을 전달할 목적의 Annotation
+
+<br>
+
 ```java
 @Entity  
 @Getter @Setter  
