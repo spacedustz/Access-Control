@@ -66,3 +66,5 @@
 - [데이터를 담을 DTO, Entity 설계](https://github.com/spacedustz/Access-Control/blob/main/Description/Entity.md)
 - [초기 데이터 생성, 주기적인 Schedule Task 작업](https://github.com/spacedustz/Access-Control/blob/main/Description/Init-Data.md)
 - [MQTT -> Rabbit -> Spring으로 넘어온 데이터 필터링](https://github.com/spacedustz/Access-Control/blob/main/Description/Listener.md)
+- [WebSocket & HttpHandshakeInterceptor](https://github.com/spacedustz/Access-Control/blob/main/Description/WebSocket.md)
+- [데이터를 표시할 간단한 Spring Web](https://github.com/spacedustz/Access-Control/blob/main/Description/Page.md)
