@@ -5,16 +5,14 @@ import com.accesscontrol.error.CommonException;
 import com.accesscontrol.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 /**
  * @author: 신건우
@@ -25,7 +23,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class InitSchemaLoader implements ApplicationRunner {
+public class InitDataSchedule {
 
     private final EventRepository eventRepository;
 
@@ -34,8 +32,13 @@ public class InitSchemaLoader implements ApplicationRunner {
         return eventRepository.count();
     }
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
+    @Scheduled(cron = "1 0 0 * * *", zone = "Asia/Seoul")
+    public void scheduleTask() throws Exception {
+        addData();
+        log.info("데이터 생성 태스크 실행 - 시간 : {}", LocalDateTime.now());
+    }
+
+    public void addData() throws Exception {
 
         // 테이블에 데이터 수 확인
         long objectCount = getEntityCount();
