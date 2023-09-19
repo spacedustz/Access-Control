@@ -66,5 +66,5 @@
 ## 구현
 
 - [Setting, Entity, DTO](https://github.com/spacedustz/Access-Control/blob/main/Description/Setting.md)
-- [데이터 생성 Schedule Task](https://github.com/spacedustz/Access-Control/blob/main/Description/Init-Data.png)
-- [MQTT -> Rabbit -> Spring으로 넘어온 데이터 필터링](https://github.com/spacedustz/Access-Control/blob/main/Description/Listener.png)
+- [데이터 생성 Schedule Task](https://github.com/spacedustz/Access-Control/blob/main/Description/Init-Data.md)
+- [MQTT -> Rabbit -> Spring으로 넘어온 데이터 필터링](https://github.com/spacedustz/Access-Control/blob/main/Description/Listener.md)
