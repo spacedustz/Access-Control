@@ -1,9 +1,6 @@
 package com.accesscontrol.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,13 +14,25 @@ import java.time.LocalDateTime;
 public class Event {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Setter
-    private int inCount = 0;
+
+    private LocalDateTime eventTime; // 이벤트 시간
 
     @Setter
-    private int outCount = 0;
+    private int inCount = 0; // 입장 카운트
 
-    private LocalDateTime eventTime;
+    @Setter
+    private int outCount = 0; // 퇴장 카운트
+
+    @Setter
+    private int occupancy = 0; // 현재 Room 내 인원 수 : InCount - OutCount
+
+    @Setter
+    private int maxCount = 15; // 최대 수용 인원
+
+    private String relayUrl = ""; // Relay URL
+
+    @Setter
+    private String status = "입장 가능합니다."; // Room 상태
 
     private Event(LocalDateTime eventTime) {
         this.eventTime = eventTime;
@@ -32,11 +41,5 @@ public class Event {
     // 생성자 - 정적 팩토리 함수
     public static Event createOf(LocalDateTime eventTime) {
         return new Event(eventTime);
-    }
-
-    // 하루가 지날때 마다 count 수 초기화
-    public void initializeCount() {
-        this.inCount = 0;
-        this.outCount = 0;
     }
 }
