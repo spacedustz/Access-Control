@@ -1,5 +1,6 @@
 package com.accesscontrol.entity;
 
+import com.accesscontrol.service.WebSocketEntityListener;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(WebSocketEntityListener.class)
 public class Event {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
