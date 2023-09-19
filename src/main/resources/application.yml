@@ -38,3 +38,7 @@ logging:
   level:
     org:
       hibernate: info
+
+operation:
+  open-time: "09:00"
+  close-time: "18:00"
