@@ -12,6 +12,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -35,6 +36,7 @@ public class RabbitTopicListener {
 
     private String currentDate = String.valueOf(LocalDate.now());
     private final EventRepository eventRepository;
+    private final SimpMessagingTemplate template;
 
     @Cacheable("entityCount")
     public Long getEntityCount() {
@@ -126,6 +128,9 @@ public class RabbitTopicListener {
             event.setOccupancy(event.getInCount() - event.getOutCount());
             log.info("재실 인원/최대인원 : {}명/{}명", event.getOccupancy(), event.getMaxCount());
             eventRepository.save(event);
+
+            // Web Socket Session 에 Event 객체 전달
+            template.convertAndSend("/count/data", event);
         }
     }
 
