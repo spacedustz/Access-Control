@@ -8,32 +8,36 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
     <script type="text/javascript">
-        var socket = new SockJS('/websocket');
+        var socket = new WebSocket('ws://localhost:8090/ws');
         var stompClient = Stomp.over(socket);
 
         stompClient.connect({}, function(frame) {
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/data', function(data){
-                console.log(data.body); // 실시간 데이터 출력
-                // 여기에 실시간으로 데이터를 화면에 업데이트하는 코드를 작성
+            stompClient.subscribe('/count/data', function(data){
+                var eventData = JSON.parse(data.body); // 실시간 데이터 파싱
+                updateCount(eventData);
             });
         });
+
+        // 실시간으로 데이터를 업데이트하는 함수
+        function updateCount(eventData) {
+            document.getElementById('count').innerText = eventData.occupancy + " / " + eventData.maxCount;
+            document.getElementById('status').innerText = eventData.status;
+        }
     </script>
 
 </head>
 <body>
 
 <div align="center">
-<h1>입장 가능 인원: <span id="count">1/15</span></h1>
+    <div>
+        <h1>현재 : <span id="status"></span></h1>
+    </div>
+
+    <div>
+        <h2>입장 가능 인원: <span id="count" class="text-center"></span></h2>
+    </div>
 </div>
-
-<script type="text/javascript">
-    var socket = new WebSocket('ws://localhost:8080/ws/events');
-
-    socket.onmessage = function(event) {
-        document.getElementById('count').innerText = event.data;
-    };
-</script>
 
 </body>
 </html>
