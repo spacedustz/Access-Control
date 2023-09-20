@@ -7,18 +7,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
-    <script src="index.js"></script>
+    <script src="admin.js"></script>
 
 </head>
 <body style="background-color: lightblue">
 
 <div align="center">
     <div>
-        <h1>현재 : <span id="status"></span></h1>
+        <input type="text" id="new-status" name="newStatus" placeholder="새로운 상태 입력">
+        <button type="button" onclick="updateStatus()">상태 변경</button>
     </div>
 
     <div>
-        <h2>입장 가능 인원: <span id="count" class="text-center"></span>/<span id="max" class="text-center"></span></h2>
+        <input type="text" id="new-max" name="newStatus" placeholder="변경할 최대 인원 수 입력">
+        <button type="button" onclick="updateMaxCount()">최대 인원 변경</button>
     </div>
 </div>
 
