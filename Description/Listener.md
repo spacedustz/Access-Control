@@ -22,6 +22,12 @@ RabbitMQ의 Queue에 쌓인 데이터를 `@RabbitListener`를 사용해서 가�
 **현재 내부 인원의 수 : Occupancy**
 - 최대 인원을 초과할 수 있으며, 인원이 초과해도 일단 문을 열어줍니다. 문을 열되 만실임을 알려줍니다.
 
+<br>
+
+**`template.convertAndSend("/count/data", event)` 부분**
+- 로직 마지막의 이 부분은 브라우저에서 접속할 WebSocket의 Subscribe URL입니다.
+- 메시지가 넘어올때마다 변환, 비교, 검증을 한 후 객체를 소켓으로 내보냅니다.
+
 
 ```java  
 @Slf4j  
@@ -37,6 +43,7 @@ public class RabbitTopicListener {
   
     private String currentDate = String.valueOf(LocalDate.now());  
     private final EventRepository eventRepository;  
+    private final SimpMessagingTemplate template;  
   
     @Cacheable("entityCount")  
     public Long getEntityCount() {  
@@ -128,6 +135,9 @@ public class RabbitTopicListener {
             event.setOccupancy(event.getInCount() - event.getOutCount());  
             log.info("재실 인원/최대인원 : {}명/{}명", event.getOccupancy(), event.getMaxCount());  
             eventRepository.save(event);  
+  
+            // Web Socket Session 에 Event 객체 전달  
+            template.convertAndSend("/count/data", event);  
         }  
     }  
   
