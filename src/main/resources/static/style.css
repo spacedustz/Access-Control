@@ -1,0 +1,39 @@
+/* Button */
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Input */
+input[type="text"],
+input[type="number"] {
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Div */
+div {
+    margin-bottom:.8rem;
+    padding:.8rem;
+    background-color:#f9f9f9;
+    border-radius:.3rem;
+    box-shadow:.1rem .1rem .3rem rgba(0,0,0,.2);
+}
+
+/* Span */
+span {
+    font-weight:bold
+}
+
+/* Paragraph */
+p {
+    font-size :18px
+}
