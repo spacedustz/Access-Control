@@ -97,5 +97,6 @@ public class InitDataSchedule implements ApplicationRunner {
                 throw new CommonException("INIT-001", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
+        addData();
     }
 }
