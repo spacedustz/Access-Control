@@ -30,4 +30,12 @@ public class WebSocketController {
     public ResponseEntity<EventDTO.Response> getInitData() {
         return new ResponseEntity<>(EventDTO.Response.fromEntity(eventService.getInitData()), HttpStatus.OK);
     }
+
+    // 관리자 페이지용 Entity 조회
+    @GetMapping("/stat")
+    public ResponseEntity<EventDTO.Response> getDetail() {
+        return new ResponseEntity<>(EventDTO.Response.fromEntity2(eventService.getInitData()), HttpStatus.OK);
+    }
+
+
 }
