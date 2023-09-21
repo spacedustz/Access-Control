@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
+    private final SimpMessagingTemplate template;
 
     @Cacheable("entityCount")
     public Long getEntityCount() {
@@ -41,6 +43,7 @@ public class EventService {
             throw new CommonException("EVENT-001", HttpStatus.BAD_REQUEST);
         }
 
+        template.convertAndSend("/count/data", event);
         log.info("Event 객체 상태 업데이트 완료 - 상태 : {}", event.getStatus());
         return event.getStatus();
     }
@@ -59,6 +62,7 @@ public class EventService {
             throw new CommonException("EVENT-001", HttpStatus.BAD_REQUEST);
         }
 
+        template.convertAndSend("/count/data", event);
         log.info("Event 객체 최대 인원 업데이트 완료 - 최대 인원 : {}", event.getMaxCount());
         return event;
     }
