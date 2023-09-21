@@ -69,3 +69,4 @@
 - [WebSocket & HttpHandshakeInterceptor](https://github.com/spacedustz/Access-Control/blob/main/Description/WebSocket.md)
 - [브라우저 <-> Spring 간단한 Rest API 작성](https://github.com/spacedustz/Access-Control/blob/main/Description/API.md)
 - [WebSocket에 접속해 실시간으로 데이터의 변화를 표시할 간단한 Spring Web View](https://github.com/spacedustz/Access-Control/blob/main/Description/View.md)
+- [전광판용 화면, 관리자용 값 수정 화면 분리](https://github.com/spacedustz/Access-Control/blob/main/Description/SeparateView.md)
