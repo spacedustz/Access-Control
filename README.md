@@ -70,3 +70,11 @@
 - [브라우저 <-> Spring 간단한 Rest API 작성](https://github.com/spacedustz/Access-Control/blob/main/Description/API.md)
 - [WebSocket에 접속해 실시간으로 데이터의 변화를 표시할 간단한 Spring Web View](https://github.com/spacedustz/Access-Control/blob/main/Description/View.md)
 - [전광판용 화면, 관리자용 값 수정 화면 분리](https://github.com/spacedustz/Access-Control/blob/main/Description/SeparateView.md)
+
+<br>
+
+## 결과물
+
+디자인 수정 중, 수정된 값들은 웹 소켓을 통해 페이지 새로고침이나 Re-Rendering 없이 실시간으로 기본 페이지의 값, 어드민 페이지의 값이 업데이트 됩니다.
+
+![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-done2.png)
