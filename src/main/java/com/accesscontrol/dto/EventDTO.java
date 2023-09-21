@@ -30,12 +30,20 @@ public class EventDTO {
         private int occupancy; // 현재 Room 내 인원 수 : InCount - OutCount
         private int maxCount; // 최대 수용 인원
         private String status; // Room 상태
+        private String relayUrl; // Relay URL
 
         private Response(int maxCount) {
             this.maxCount = maxCount;
         }
 
-        // 초기 데이터 로드용
+        private Response(Long id, int occupancy, int maxCount, String status) {
+            this.id = id;
+            this.occupancy = occupancy;
+            this.maxCount = maxCount;
+            this.status = status;
+        }
+
+        // 전광판용 초기 데이터 로드용
         public static EventDTO.Response fromEntity(com.accesscontrol.entity.Event entity) {
             return new EventDTO.Response(
                     entity.getId(),
@@ -46,9 +54,20 @@ public class EventDTO {
         }
 
         // maxCount 업데이트 용
-        public static EventDTO.Response fromEntityForUpdateMaxCount(com.accesscontrol.entity.Event entty) {
+        public static EventDTO.Response fromEntityForUpdateMaxCount(com.accesscontrol.entity.Event entity) {
             return new EventDTO.Response(
-                    entty.getMaxCount()
+                    entity.getMaxCount()
+            );
+        }
+
+        // 관리자 페이지용 엔티티 정보
+        public static EventDTO.Response fromEntity2(com.accesscontrol.entity.Event entity) {
+            return new EventDTO.Response(
+                    entity.getId(),
+                    entity.getOccupancy(),
+                    entity.getMaxCount(),
+                    entity.getStatus(),
+                    entity.getRelayUrl()
             );
         }
     }
