@@ -19,22 +19,24 @@
   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>  
-  
-    <script src="index.js"></script>  
-  
+    <link rel="stylesheet" href="style.css">  
 </head>  
+  
 <body style="background-color: lightblue">  
   
 <div align="center">  
     <div>  
-        <h1>현재 : <span id="status"></span></h1>  
+        <h1><span id="status"></span></h1>  
     </div>  
+  
+    <br>  
   
     <div>  
         <h2>입장 가능 인원: <span id="count" class="text-center"></span>/<span id="max" class="text-center"></span></h2>  
     </div>  
 </div>  
   
+<script src="index.js"></script>  
 </body>  
 </html>
 ```
@@ -65,6 +67,31 @@ stompClient.connect({}, (frame) => {
 // 렌더링 시 Entity 값 화면에 출력  
 window.onload = function () { loadInitialData(); };  
   
+// 현재 방 인원에 따라 Status 글씨 색상 바꾸기  
+function changeStatusColor(occupancy) {  
+    var status = document.getElementById('status');  
+  
+    if (occupancy < 10) {  
+        status.style.color = 'green';  
+    } else if (occupancy > 12) {  
+        status.style.color = 'orange';  
+    } else if (occupancy > 14) {  
+        status.style.color = 'red';  
+    }  
+}  
+  
+function displayStatusWithColor(status, occupancy) {  
+    let coloredStatus = document.getElementById('status').innerText = status;  
+  
+    if (occupancy < 10) {  
+        status.style.color = 'green';  
+    } else if (occupancy > 12) {  
+        status.style.color = 'orange';  
+    } else if (occupancy > 14) {  
+        status.style.color = 'red';  
+    }  
+}  
+  
 function loadInitialData() {  
     fetchJson(httpUrl + '/init')  
         .then(initialRoomInfo => {  
@@ -78,6 +105,7 @@ function loadInitialData() {
             displayStatus(roomInfo.status);  
             displayOccupancy(roomInfo.occupancy);  
             displayMaxCount(roomInfo.maxCount);  
+            changeStatusColor();  
         });  
 }  
   
@@ -86,16 +114,12 @@ function updateRoomInfo(updatedData) {
     displayStatus(updatedData.status);  
     displayOccupancy(updatedData.occupancy);  
     displayMaxCount(updatedData.maxCount);  
+    changeStatusColor();  
 }  
   
-/* --- Utility 함수 --- */function fetchJson(url, method='GET') {  
-    return window.fetch(url, { method , headers : {'Content-Type': 'application/json'}})  
-        .then(response => response.json());  
-}  
-  
-function fetchText(url, method='PATCH', body={}) {  
-    return window.fetch(url,{method , headers : {'Content-Type': 'application/json'}, body : JSON.stringify(body)})  
-        .then(response => response.text());  
+// 최대 인원  
+function displayMaxCount(max) {  
+    document.getElementById('max').innerText = max;  
 }  
   
 // 방안의 현재 인원  
@@ -105,12 +129,12 @@ function displayOccupancy(occupancy) {
   
 // 방안의 상태  
 function displayStatus(status) {  
-    document.getElementById('status').innerText = status ;  
+    document.getElementById('status').innerText = status;  
 }  
   
-// 최대 인원  
-function displayMaxCount(max) {  
-    document.getElementById('max').innerText = max;  
+/* --- Utility 함수 --- */function fetchJson(url, method='GET') {  
+    return window.fetch(url, { method , headers : {'Content-Type': 'application/json'}})  
+        .then(response => response.json());  
 }
 ```
 
@@ -131,24 +155,48 @@ function displayMaxCount(max) {
   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>  
-  
-    <script src="admin.js"></script>  
-  
+    <link rel="stylesheet" href="style.css">  
 </head>  
+  
 <body style="background-color: lightblue">  
   
 <div align="center">  
+    <h1>운영 시간 : <span id="time"></span></h1>  
+</div>  
+  
+<div align="center">  
+    <h2>상태 메시지 변경</h2>  
+    <p>현재 상태 메시지 : <span id="status"></span></p>  
     <div>  
         <input type="text" id="new-status" name="newStatus" placeholder="새로운 상태 입력">  
         <button type="button" onclick="updateStatus()">상태 변경</button>  
     </div>  
   
     <div>  
+        <input type="text" id="close-room" name="closeRoom" placeholder="고장 or 수리중">  
+        <button type="button" onclick="closeRoom()">영업 중지</button>  
+    </div>  
+</div>  
+  
+<br>  
+  
+<div align="center">  
+    <h2>최대 인원 변경</h2>  
+    <p>현재 재실 인원 : <span id="count"></span></p>  
+    <p>최대 인원 : <span id="max"></span></p>  
+    <div>  
         <input type="text" id="new-max" name="newStatus" placeholder="변경할 최대 인원 수 입력">  
         <button type="button" onclick="updateMaxCount()">최대 인원 변경</button>  
     </div>  
 </div>  
   
+<div align="center">  
+    <h2>Relay URL</h2>  
+    <p><span id="url"></span></p>  
+</div>  
+  
+  
+<script src="admin.js"></script>  
 </body>  
 </html>
 ```
@@ -160,11 +208,49 @@ const httpUrl = 'http://localhost:8090/ws';
 let socket = new WebSocket(wsUrl);  
 let stompClient = Stomp.over(socket);  
   
+let roomInfo = {  
+    occupancy: 0, // 현재 Room 내 인원 수 : InCount - OutCount    maxCount: 0, // 최대 수용 인원  
+    status: "", // Room 상태  
+    relayUrl: "" // Relay URL  
+};  
+  
+const time = {  
+    value: "09:00 - 18:00"  
+};  
+  
 stompClient.connect({}, (frame) => {  
     console.log('Socket Connected : ' + frame);  
     stompClient.subscribe('/count/data', function (data) {  
+        let updatedRoomInfo = JSON.parse(data.body);  
+        showStats(updatedRoomInfo);  
     });  
 });  
+  
+window.onload = function () { getData(); };  
+  
+function showStats(data) {  
+    displayStatus(data.status);  
+    displayOccupancy(data.occupancy);  
+    displayMaxCount(data.maxCount);  
+    displayOperationTime();  
+    displayRelayUrl(data.relayUrl);  
+}  
+  
+function getData() {  
+    fetchJson(httpUrl + '/stat')  
+        .then(data => {  
+            roomInfo.occupancy = data.occupancy;  
+            roomInfo.maxCount = data.maxCount;  
+            roomInfo.status = data.status;  
+            roomInfo.relayUrl = data.relayUrl;  
+  
+            displayStatus(roomInfo.status);  
+            displayOccupancy(roomInfo.occupancy);  
+            displayMaxCount(roomInfo.maxCount);  
+            displayOperationTime();  
+            displayRelayUrl(roomInfo.relayUrl);  
+        });  
+}  
   
 // Status 값 변경  
 function updateStatus() {  
@@ -172,7 +258,19 @@ function updateStatus() {
   
     fetchText(httpUrl + '/update-status?status=' + newStatusValue, 'PATCH', {})  
         .then(data => {  
-            console.log('업데이트 된 상태 : ', data.status);  
+            console.log('업데이트 된 상태 : ', data);  
+        })  
+  
+    return false; // 기본 양식 제출 방지  
+}  
+  
+// 영업 불가일때 상태 변경  
+function closeRoom() {  
+    let closeRoomValue = document.getElementById('close-room').value;  
+  
+    fetchText(httpUrl + '/update-status?status=' + closeRoomValue, 'PATCH', {})  
+        .then(data => {  
+            console.log('업데이트 된 상태 : ', data);  
         })  
   
     return false; // 기본 양식 제출 방지  
@@ -190,6 +288,31 @@ function updateMaxCount() {
     return false; // 기본 양식 제출 방지  
 }  
   
+// 최대 인원  
+function displayMaxCount(max) {  
+    document.getElementById('max').innerText = max;  
+}  
+  
+// Relay URL  
+function displayRelayUrl(url) {  
+    document.getElementById('url').innerText = url;  
+}  
+  
+// 운영 시간  
+function displayOperationTime() {  
+    document.getElementById('time').innerText = time.value;  
+}  
+  
+// 방안의 현재 인원  
+function displayOccupancy(occupancy) {  
+    document.getElementById('count').innerText= occupancy;  
+}  
+  
+// 방안의 상태  
+function displayStatus(status) {  
+    document.getElementById('status').innerText = status;  
+}  
+  
 /* --- Utility 함수 --- */function fetchJson(url, method='GET') {  
     return window.fetch(url, { method , headers : {'Content-Type': 'application/json'}})  
         .then(response => response.json());  
@@ -200,3 +323,57 @@ function fetchText(url, method='PATCH', body={}) {
         .then(response => response.text());  
 }
 ```
+
+<br>
+
+**CSS**
+
+스타일은 계속 수정중이지만 지금은 아주 간단하게 해놨습니다.
+
+```css
+/* Button */  
+button {  
+    background-color: #4CAF50;  
+    color: white;  
+    padding: 10px 20px;  
+    border: none;  
+    border-radius: 4px;  
+    cursor: pointer;  
+}  
+  
+button:hover {  
+    background-color: #45a049;  
+}  
+  
+/* Input */  
+input[type="text"],  
+input[type="number"] {  
+    padding: 8px;  
+    border-radius: 4px;  
+}  
+  
+/* Div */  
+div {  
+    margin-bottom:.8rem;  
+    padding:.8rem;  
+    background-color:#f9f9f9;  
+    border-radius:.3rem;  
+    box-shadow:.1rem .1rem .3rem rgba(0,0,0,.2);  
+}  
+  
+/* Span */  
+span {  
+    font-weight:bold  
+}  
+  
+/* Paragraph */  
+p {  
+    font-size :18px  
+}
+```
+
+<br>
+
+**결과물 (스타일 수정중)**
+
+![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-done2.png)
