@@ -24,6 +24,31 @@ stompClient.connect({}, (frame) => {
 // 렌더링 시 Entity 값 화면에 출력
 window.onload = function () { loadInitialData(); };
 
+// 현재 방 인원에 따라 Status 글씨 색상 바꾸기
+function changeStatusColor(occupancy) {
+    var status = document.getElementById('status');
+
+    if (occupancy < 10) {
+        status.style.color = 'green';
+    } else if (occupancy > 12) {
+        status.style.color = 'orange';
+    } else if (occupancy > 14) {
+        status.style.color = 'red';
+    }
+}
+
+function displayStatusWithColor(status, occupancy) {
+    let coloredStatus = document.getElementById('status').innerText = status;
+
+    if (occupancy < 10) {
+        status.style.color = 'green';
+    } else if (occupancy > 12) {
+        status.style.color = 'orange';
+    } else if (occupancy > 14) {
+        status.style.color = 'red';
+    }
+}
+
 function loadInitialData() {
     fetchJson(httpUrl + '/init')
         .then(initialRoomInfo => {
@@ -37,6 +62,7 @@ function loadInitialData() {
             displayStatus(roomInfo.status);
             displayOccupancy(roomInfo.occupancy);
             displayMaxCount(roomInfo.maxCount);
+            changeStatusColor();
         });
 }
 
@@ -45,17 +71,12 @@ function updateRoomInfo(updatedData) {
     displayStatus(updatedData.status);
     displayOccupancy(updatedData.occupancy);
     displayMaxCount(updatedData.maxCount);
+    changeStatusColor();
 }
 
-/* --- Utility 함수 --- */
-function fetchJson(url, method='GET') {
-    return window.fetch(url, { method , headers : {'Content-Type': 'application/json'}})
-        .then(response => response.json());
-}
-
-function fetchText(url, method='PATCH', body={}) {
-    return window.fetch(url,{method , headers : {'Content-Type': 'application/json'}, body : JSON.stringify(body)})
-        .then(response => response.text());
+// 최대 인원
+function displayMaxCount(max) {
+    document.getElementById('max').innerText = max;
 }
 
 // 방안의 현재 인원
@@ -65,10 +86,11 @@ function displayOccupancy(occupancy) {
 
 // 방안의 상태
 function displayStatus(status) {
-    document.getElementById('status').innerText = status ;
+    document.getElementById('status').innerText = status;
 }
 
-// 최대 인원
-function displayMaxCount(max) {
-    document.getElementById('max').innerText = max;
+/* --- Utility 함수 --- */
+function fetchJson(url, method='GET') {
+    return window.fetch(url, { method , headers : {'Content-Type': 'application/json'}})
+        .then(response => response.json());
 }

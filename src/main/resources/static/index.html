@@ -6,21 +6,23 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-
-    <script src="index.js"></script>
-
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body style="background-color: lightblue">
 
 <div align="center">
     <div>
-        <h1>현재 : <span id="status"></span></h1>
+        <h1><span id="status"></span></h1>
     </div>
+
+    <br>
 
     <div>
         <h2>입장 가능 인원: <span id="count" class="text-center"></span>/<span id="max" class="text-center"></span></h2>
     </div>
 </div>
 
+<script src="index.js"></script>
 </body>
 </html>
