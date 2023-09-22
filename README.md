@@ -1,10 +1,3 @@
-# Access-Control
-특정 공간을 카메라로 감시하며, 최대 인원 제한을 설정하고 사람이 들어가고 나갈때 자동문을 열어줍니다.
-
-사람이 들어갈때마다 카운트 수를 실시간으로 증가시키고 화면에 최대 인원에 도달 했을때와 도달 하지 않았을때 UI, 인원 수 수정 로직을 작성합니다.
-
-<br>
-
 ## 📘 **구현 내용 정리**
 - [Yaml Setting](https://github.com/spacedustz/Access-Control/blob/main/Description/Yaml.md)
 - [Rabbit Config Setting](https://github.com/spacedustz/Access-Control/blob/main/Description/Rabbit.md)
@@ -20,7 +13,9 @@
 
 ## 📘 **예상 구현 흐름**
 
-특정 공간에 실시간 카메라가 존재하며, 사람 출입 시 카메라 내부 AI 엔진에서 TripWire Crossing MQTT 이벤트 데이터 발생
+특정 공간에 실시간 카메라가 존재하며, 사람 출입 시 카메라 내부 AI 엔진에서 TripWire Crossing MQTT 이벤트 데이터가 발생합니다.
+
+이 데이터를 가지고 특정 Room의 출입 현황을 나타내는 기능을 만듭니다.
 
 <br>
 
@@ -62,6 +57,7 @@
 > 📌 **Schedule Task**
 
 Spring Batch를 쓰려 했으나 너무 오버스펙인 것 같아 Spring 내부 기능인 Schedule 기능을 사용하였습니다.
+
 매일 00시 00분 01초에 Scehdule 기능을 이용하여 매일 00시 00분에, 테이블에 현재 날짜 값을 가진 데이터가 없으면,
 자동으로 현재 날짜의 데이터를 생성하게 하는 클래스입니다.
 
