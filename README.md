@@ -65,6 +65,8 @@ Spring Batch를 쓰려 했으나 너무 오버스펙인 것 같아 Spring 내부
 매일 00시 00분 01초에 Scehdule 기능을 이용하여 매일 00시 00분에, 테이블에 현재 날짜 값을 가진 데이터가 없으면,
 자동으로 현재 날짜의 데이터를 생성하게 하는 클래스입니다.
 
+<br>
+
 **run() 함수**
 - ApplicationRunner 인터페이스를 이용해 **Spring 어플리케이션 시작 시** 실행됩니다.
 - DB에 데이터가 하나도 없으면 초기 데이터 컬럼을 생성합니다.
@@ -123,9 +125,9 @@ Spring Batch를 쓰려 했으나 너무 오버스펙인 것 같아 Spring 내부
 
 ## 📘 결과물
 
-디자인 수정 중, 수정된 값들은 웹 소켓을 통해 페이지 새로고침이나 Re-Rendering 없이 실시간으로 기본 페이지의 값, 어드민 페이지의 값이 업데이트 됩니다.
+테스트 API를 만들어 Occupancy의 값을 조정하여 특정 수치마다 글씨 색, 상태 값을 변경하는 API 요청을 소켓으로 보내 데이터를 변경
 
-![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-done2.png)
+변경한 데이터를 소켓에서 다시 받아와서 변경된 엔티티의 Occupancy, MaxCount, Status 값 등 실시간 업데이트
 
 <br>
 
