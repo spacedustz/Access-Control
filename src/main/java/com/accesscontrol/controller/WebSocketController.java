@@ -37,5 +37,9 @@ public class WebSocketController {
         return new ResponseEntity<>(EventDTO.Response.fromEntity2(eventService.getInitData()), HttpStatus.OK);
     }
 
-
+    // 입장객 카운트 테스트용 API
+    @PatchMapping("/test/{num}")
+    public void testCount(@PathVariable("num") int num) {
+        eventService.testCount(num);
+    }
 }
