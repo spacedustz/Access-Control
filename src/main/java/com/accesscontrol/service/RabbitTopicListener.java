@@ -37,6 +37,7 @@ public class RabbitTopicListener {
     private String currentDate = String.valueOf(LocalDate.now());
     private final EventRepository eventRepository;
     private final SimpMessagingTemplate template;
+    private final RecycleFn recycleFn;
 
     @Cacheable("entityCount")
     public Long getEntityCount() {
@@ -127,6 +128,9 @@ public class RabbitTopicListener {
 
             event.setOccupancy(event.getInCount() - event.getOutCount());
             log.info("재실 인원/최대인원 : {}명/{}명", event.getOccupancy(), event.getMaxCount());
+
+            recycleFn.autoUpdateStatus(event);
+
             eventRepository.save(event);
 
             // Web Socket Session 에 Event 객체 전달
