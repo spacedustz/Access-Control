@@ -9,39 +9,37 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body style="background-color: lightblue">
+<body>
 
-<div align="center">
+<div>
     <h1>운영 시간 : <span id="time"></span></h1>
-</div>
-
-<div align="center">
-    <h2>상태 메시지 변경</h2>
-    <p>현재 상태 메시지 : <span id="status"></span></p>
-    <div>
-        <input type="text" id="new-status" name="newStatus" placeholder="새로운 상태 입력">
-        <button type="button" onclick="updateStatus()">상태 변경</button>
-    </div>
-
-    <div>
-        <input type="text" id="close-room" name="closeRoom" placeholder="고장 or 수리중">
-        <button type="button" onclick="closeRoom()">영업 중지</button>
-    </div>
 </div>
 
 <br>
 
-<div align="center">
+<div>
+    <h2>상태 메시지 변경</h2>
+    <p>현재 상태 메시지 : <span id="status"></span></p>
+
+    <input type="text" id="new-status" name="newStatus" placeholder="새로운 상태 입력">
+    <button type="button" onclick="updateStatus()">상태 변경</button>
+</div>
+
+<br>
+
+<div>
     <h2>최대 인원 변경</h2>
     <p>현재 재실 인원 : <span id="count"></span></p>
     <p>최대 인원 : <span id="max"></span></p>
-    <div>
-        <input type="text" id="new-max" name="newStatus" placeholder="변경할 최대 인원 수 입력">
-        <button type="button" onclick="updateMaxCount()">최대 인원 변경</button>
-    </div>
+
+    <input type="text" id="new-max" name="newStatus" placeholder="변경할 최대 인원 수 입력">
+    <button type="button" onclick="updateMaxCount()">최대 인원 변경</button>
+
 </div>
 
-<div align="center">
+<br>
+
+<div>
     <h2>Relay URL</h2>
     <p><span id="url"></span></p>
 </div>
