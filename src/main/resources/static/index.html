@@ -9,19 +9,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body style="background-color: lightblue">
+<body>
 
-<div align="center">
-    <div>
-        <h1><span id="status"></span></h1>
+<br>
+
+<section>
+    <span id="status" style="font-size: 40px; font-weight: normal;"></span>
+</section>
+
+<section>
+    <div class="flex-container">
+        <h2>현재 이용 인원</h2>
+        <p><span id="count" class="text-occupancy"></span></p>
+
+        <h2>최대 입장 가능 인원</h2>
+        <span id="max" class="text-max"></span>
     </div>
-
-    <br>
-
-    <div>
-        <h2>입장 가능 인원: <span id="count" class="text-center"></span>/<span id="max" class="text-center"></span></h2>
-    </div>
-</div>
+</section>
 
 <script src="index.js"></script>
 </body>
