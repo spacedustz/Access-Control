@@ -49,7 +49,10 @@
 - MQTT Tripwire 데이터 중 `crossing_direction`이라는 값이 있습니다.
 - 이 값에는 `Up, Down` 2가지가 있는데 방안의 영역에 선을 그어놓고 입장하면 Direction의 값이 In, 나가면 Direction의 값이 Out이 됩니다.
 - 이 Up/Down의 수를 엔티티의 변수인 inCount, OutCount로 내부 집계 후 방안의 인원을 Occupancy(현재 방 인원) 값으로 계산 후 출력합니다.
-- **위의 과정을 거친 후 WebSocketConfig, HttpHandshakeInterceptor를 작성해 웹소켓 세션을 열어줍니다.**
+
+<br>
+
+**위의 과정을 거친 후 WebSocketConfig, HttpHandshakeInterceptor를 작성해 웹소켓 세션을 열어줍니다.**
 - Web Socket 세션을 열고 나서 엔티티를 DB에 저장하고 저장한 엔티티를 WebSocket으로 내보냅니다.
 - 그 외 앞단에서 필요한 함수들을 그떄그떄 다른 Service (EventService)에서 만들고 Rest API를 만듭니다.
 - API 요청/데이터 변경 시, 변경된 엔티티를 웹소켓으로 전달합니다. (화면에 실시간으로 데이터의 수치 변화를 보여주기 위한 용도)
@@ -62,12 +65,14 @@ Spring Batch를 쓰려 했으나 너무 오버스펙인 것 같아 Spring 내부
 매일 00시 00분 01초에 Scehdule 기능을 이용하여 매일 00시 00분에, 테이블에 현재 날짜 값을 가진 데이터가 없으면,
 자동으로 현재 날짜의 데이터를 생성하게 하는 클래스입니다.
 
-* run() 함수
+**run() 함수**
 - ApplicationRunner 인터페이스를 이용해 **Spring 어플리케이션 시작 시** 실행됩니다.
 - DB에 데이터가 하나도 없으면 초기 데이터 컬럼을 생성합니다.
 - 만약 데이터가 1개 이상이라면, addData()함수를 호출해 날짜가 중복되지 않은 새로운 엔티티를 생성합니다.
 
-* addData() 함수
+<br>
+
+**addData() 함수**
 - DB에 객체가 1개 이상이고, 데이터의 날짜가 오늘 날짜가 아닐때 오늘 날짜에 해당하는 객체를 새로 생성합니다.
 
 <br>
@@ -75,7 +80,13 @@ Spring Batch를 쓰려 했으나 너무 오버스펙인 것 같아 Spring 내부
 > 📌 **View**
 
 - 화면은 단 2개가 필요하므로, React 프로젝트를 제거하고 타임리프를 쓸 필요도 없이 기본 Spring Web에서 진행합니다.
-- 데이터를 받아 현재 방안의 인원을 State로 만들어 실시간으로 인원수를 카운팅 합니다.
+- 데이터를 받아 현재 방안의 인원을 State로 만들어 WebSocket으로부터 데이터를 실시간으로 받아 인원수를 카운팅/표시 합니다.
+
+<br>
+
+자세한 내용은 아래 링크로
+- [WebSocket에 접속해 실시간으로 데이터의 변화를 표시할 간단한 Spring Web View](https://github.com/spacedustz/Access-Control/blob/main/Description/View.md)
+- [현황판용 화면, 관리자용 값 수정 화면 분리](https://github.com/spacedustz/Access-Control/blob/main/Description/SeparateView.md)
 
 <br>
 
