@@ -12,6 +12,11 @@ button:hover {
     background-color: #45a049;
 }
 
+body {
+    background-color: slategray;
+    /*background-image: url(back.png);*/
+}
+
 /* Input */
 input[type="text"],
 input[type="number"] {
@@ -19,11 +24,15 @@ input[type="number"] {
     border-radius: 4px;
 }
 
+section {
+    text-align: center;
+}
+
 /* Div */
 div {
+    text-align: center;
     margin-bottom:.8rem;
     padding:.8rem;
-    background-color:#f9f9f9;
     border-radius:.3rem;
     box-shadow:.1rem .1rem .3rem rgba(0,0,0,.2);
 }
@@ -36,4 +45,37 @@ span {
 /* Paragraph */
 p {
     font-size :18px
+}
+
+.view {
+    color: cornsilk;
+}
+
+.text-occupancy {
+    vertical-align: top;
+    background-color: #45a049;
+    padding: 7px;
+    color: black;
+    margin-right: 15px;
+    margin-left: 15px;
+    border-radius: 10px;
+    font-size: 30px;
+}
+
+.text-max {
+    vertical-align: top;
+    background-color: #45a049;
+    padding: 7px;
+    color: black;
+    margin-right: 15px;
+    margin-left: 15px;
+    border-radius: 10px;
+    font-size: 30px;
+}
+
+.flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
