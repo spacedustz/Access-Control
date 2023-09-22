@@ -23,6 +23,7 @@ stompClient.connect({}, (frame) => {
     });
 });
 
+// 렌더링 시, 초기 데이터 값 출력
 window.onload = function () { getData(); };
 
 function showStats(data) {
@@ -54,18 +55,6 @@ function updateStatus() {
     let newStatusValue= document.getElementById('new-status').value;
 
     fetchText(httpUrl + '/update-status?status=' + newStatusValue, 'PATCH', {})
-        .then(data => {
-            console.log('업데이트 된 상태 : ', data);
-        })
-
-    return false; // 기본 양식 제출 방지
-}
-
-// 영업 불가일때 상태 변경
-function closeRoom() {
-    let closeRoomValue = document.getElementById('close-room').value;
-
-    fetchText(httpUrl + '/update-status?status=' + closeRoomValue, 'PATCH', {})
         .then(data => {
             console.log('업데이트 된 상태 : ', data);
         })
