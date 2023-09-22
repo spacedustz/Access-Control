@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EventService {
     private final EventRepository eventRepository;
     private final SimpMessagingTemplate template;
+    private final RecycleFn recycleFn;
 
     @Cacheable("entityCount")
     public Long getEntityCount() {
@@ -55,6 +56,7 @@ public class EventService {
         try {
             event = getEntity(getEntityCount());
             event.setMaxCount(Integer.parseInt(max));
+            recycleFn.autoUpdateStatus(event);
             eventRepository.save(event);
         } catch (Exception e) {
             assert event != null;
@@ -74,6 +76,7 @@ public class EventService {
 
         try {
             event = getEntity(getEntityCount());
+            recycleFn.autoUpdateStatus(event);
         } catch (Exception e) {
             assert false;
             log.error("초시 Event 객체 로드 실패 - Event ID : {}", event.getId());
@@ -82,5 +85,20 @@ public class EventService {
 
         log.info("Event 객체 초기 로드 완료 - Event ID : {}", event.getId());
         return event;
+    }
+
+    public void testCount(int num) {
+        Event event = null;
+
+        try {
+            event = getEntity(getEntityCount());
+            event.setOccupancy(num);
+            recycleFn.autoUpdateStatus(event);
+            template.convertAndSend("/count/data", event);
+        } catch (Exception e) {
+            assert false;
+            log.error("초시 Event 객체 로드 실패 - Event ID : {}", event.getId());
+            throw new CommonException("EVENT-001", HttpStatus.BAD_REQUEST);
+        }
     }
 }
