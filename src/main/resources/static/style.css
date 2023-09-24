@@ -51,6 +51,10 @@ p {
     color: cornsilk;
 }
 
+.title {
+    color: white;
+}
+
 .text-occupancy {
     vertical-align: top;
     background-color: #45a049;
