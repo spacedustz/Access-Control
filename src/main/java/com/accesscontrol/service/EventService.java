@@ -31,12 +31,12 @@ public class EventService {
     }
 
     // Event 객체의 Status 값 업데이트
-    public String updateStatus(String status) {
+    public String updateCustomStatus(String status) {
         Event event = null;
 
         try {
             event = getEntity(getEntityCount());
-            event.setStatus(status);
+            event.setCustomStatus(status);
             eventRepository.save(event);
         } catch (Exception e) {
             assert event != null;
@@ -45,8 +45,8 @@ public class EventService {
         }
 
         template.convertAndSend("/count/data", event);
-        log.info("Event 객체 상태 업데이트 완료 - 상태 : {}", event.getStatus());
-        return event.getStatus();
+        log.info("Event 객체 상태 업데이트 완료 - 상태 : {}", event.getCustomStatus());
+        return event.getCustomStatus();
     }
 
     // maxCount 값 업데이트
@@ -78,23 +78,47 @@ public class EventService {
             event = getEntity(getEntityCount());
             recycleFn.autoUpdateStatus(event);
         } catch (Exception e) {
-            log.error("초기 Event 객체 로드 실패", e);
+            log.error("Event 객체 데이터 로드 실패", e);
         }
 
-        log.info("Event 객체 초기 로드 완료");
+        assert event != null;
+        log.info("Event 객체 데이터 로드 완료 - Event ID : {}", event.getId());
         return event;
     }
 
-    public void testCount(int num) {
+    // 재실 인원 값 증가 함수
+    public void increaseOccupancy(int num) {
         Event event = null;
 
         try {
             event = getEntity(getEntityCount());
-            event.setOccupancy(num);
+            event.setInCount(event.getInCount() + num);
+            event.setOccupancy(event.getOccupancy() + num);
+
             recycleFn.autoUpdateStatus(event);
+            eventRepository.save(event);
             template.convertAndSend("/count/data", event);
+            log.info("재실 인원 값 증가 성공 - 감소한 수치 : {}, 반영된 현재 방안 인원 수치 : {}", num, event.getOccupancy());
         } catch (Exception e) {
-            log.error("테스트 Occupancy Count 실패", e);
+            log.error("재실 인원 수 조정 실패 [증가]", e);
+        }
+    }
+
+    // 재실 인원 값 감소 함수
+    public void decreaseOccupancy(int num) {
+        Event event = null;
+
+        try {
+            event = getEntity(getEntityCount());
+            event.setOutCount(event.getOutCount() - num);
+            event.setOccupancy(event.getOccupancy() - num);
+
+            recycleFn.autoUpdateStatus(event);
+            eventRepository.save(event);
+            template.convertAndSend("/count/data", event);
+            log.info("재실 인원 값 감소 성공 - 감소한 수치 : {}, 반영된 현재 방안 인원 수치 : {}", num, event.getOccupancy());
+        } catch (Exception e) {
+            log.error("재실 인원 수 조정 실패 [감소]", e);
         }
     }
 }
