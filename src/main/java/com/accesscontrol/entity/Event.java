@@ -32,7 +32,11 @@ public class Event {
     private String relayUrl = ""; // Relay URL
 
     @Setter
-    private String status = "입장 가능합니다."; // Room 상태
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.LOW; // Room 상태 기본값 : 입장 가능합니다.
+
+    @Setter
+    private String customStatus = ""; // 임의로 상태를 변경하고 싶을때 사용할 변수
 
     private Event(LocalDateTime eventTime) {
         this.eventTime = eventTime;
