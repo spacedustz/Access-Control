@@ -29,27 +29,38 @@ public class EventDTO {
         private Long id; // ID
         private int occupancy; // 현재 Room 내 인원 수 : InCount - OutCount
         private int maxCount; // 최대 수용 인원
-        private String status; // Room 상태
+        private String customStatus; // Room 상태
         private String relayUrl; // Relay URL
 
         private Response(int maxCount) {
             this.maxCount = maxCount;
         }
 
-        private Response(Long id, int occupancy, int maxCount, String status) {
+        private Response(Long id, int occupancy, int maxCount, String customStatus) {
             this.id = id;
             this.occupancy = occupancy;
             this.maxCount = maxCount;
-            this.status = status;
+            this.customStatus = customStatus;
         }
 
-        // 전광판용 초기 데이터 로드용
-        public static EventDTO.Response fromEntity(com.accesscontrol.entity.Event entity) {
+        // 현황판용 응답 객체
+        public static EventDTO.Response fromEntityForViewer(com.accesscontrol.entity.Event entity) {
             return new EventDTO.Response(
                     entity.getId(),
                     entity.getOccupancy(),
                     entity.getMaxCount(),
-                    entity.getStatus()
+                    entity.getStatus().getDesc()
+            );
+        }
+
+        // 관리자 페이지용 응답 객체
+        public static EventDTO.Response fromEntityForAdmin(com.accesscontrol.entity.Event entity) {
+            return new EventDTO.Response(
+                    entity.getId(),
+                    entity.getOccupancy(),
+                    entity.getMaxCount(),
+                    entity.getStatus().getDesc(),
+                    entity.getRelayUrl()
             );
         }
 
@@ -57,17 +68,6 @@ public class EventDTO {
         public static EventDTO.Response fromEntityForUpdateMaxCount(com.accesscontrol.entity.Event entity) {
             return new EventDTO.Response(
                     entity.getMaxCount()
-            );
-        }
-
-        // 관리자 페이지용 엔티티 정보
-        public static EventDTO.Response fromEntity2(com.accesscontrol.entity.Event entity) {
-            return new EventDTO.Response(
-                    entity.getId(),
-                    entity.getOccupancy(),
-                    entity.getMaxCount(),
-                    entity.getStatus(),
-                    entity.getRelayUrl()
             );
         }
     }
