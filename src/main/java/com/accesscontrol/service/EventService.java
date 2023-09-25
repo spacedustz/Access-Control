@@ -78,12 +78,10 @@ public class EventService {
             event = getEntity(getEntityCount());
             recycleFn.autoUpdateStatus(event);
         } catch (Exception e) {
-            assert false;
-            log.error("초시 Event 객체 로드 실패 - Event ID : {}", event.getId());
-            throw new CommonException("EVENT-001", HttpStatus.BAD_REQUEST);
+            log.error("초기 Event 객체 로드 실패", e);
         }
 
-        log.info("Event 객체 초기 로드 완료 - Event ID : {}", event.getId());
+        log.info("Event 객체 초기 로드 완료");
         return event;
     }
 
@@ -96,9 +94,7 @@ public class EventService {
             recycleFn.autoUpdateStatus(event);
             template.convertAndSend("/count/data", event);
         } catch (Exception e) {
-            assert false;
-            log.error("초시 Event 객체 로드 실패 - Event ID : {}", event.getId());
-            throw new CommonException("EVENT-001", HttpStatus.BAD_REQUEST);
+            log.error("테스트 Occupancy Count 실패", e);
         }
     }
 }
