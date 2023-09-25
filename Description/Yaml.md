@@ -16,49 +16,57 @@ RabbitMQ, JPA, H2 등등 설정 파일 구성
 
 <br>
 
+**Operation Time & Relay URL**
+- 운영시간과 Door API의 값을 Yaml에서 받아오도록 하였습니다.
+- Relay URL은 추후 Door API에 Request를 보내는 용도로 사용합니다. (RestTemplate or WebClient 사용)
+
 ```yaml
-server:  
-  servlet:  
-    encoding:  
-      charset: UTF-8  
-      force-response: true  
-  port: 8090  
-  
-spring:  
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      force-response: true
+  port: 8090
+
+spring:
   # H2 설정  
-  h2:  
-    console:  
-      enabled: true  
-      path: /h2  
-  datasource:  
-    url: jdbc:h2:file:E:\Data\H2\H2  
-    username: root  
-    password: 1234  
-  
+  h2:
+    console:
+      enabled: true
+      path: /h2
+  datasource:
+    url: jdbc:h2:file:E:\Data\H2\H2
+    username: root
+    password: 1234
+
   # JPA 설정  
-  jpa:  
-    open-in-view: false  
-    hibernate:  
-      ddl-auto: none  
-    show-sql: false  
-    properties:  
-      hibernate:  
-        format_sql: true  
-  
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
   # RabbitMQ 설정  
-  rabbitmq:  
-    host: localhost  
-    port: 5672  
-    username: guest  
-    password: guest  
-  
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
 # Logging  
-logging:  
-  level:  
-    org:  
-      hibernate: info  
-  
-operation:  
-  open-time: "09:00"  
+logging:
+  level:
+    org:
+      hibernate: info
+
+# 운영시간  
+operation:
+  open-time: "09:00"
   close-time: "18:00"
+
+# Door API  
+relayUrl: ""
 ```
