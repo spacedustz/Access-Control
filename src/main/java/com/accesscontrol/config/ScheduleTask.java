@@ -1,19 +1,24 @@
 package com.accesscontrol.config;
 
 import com.accesscontrol.entity.Event;
+import com.accesscontrol.entity.Status;
 import com.accesscontrol.error.CommonException;
 import com.accesscontrol.repository.EventRepository;
+import com.accesscontrol.service.RecycleFn;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -21,17 +26,37 @@ import java.time.format.DateTimeFormatter;
  * @desc
  * run() 함수 : Spring 어플리케이션 시작 시, DB에 데이터가 하나도 없으면 초기 데이터 컬럼 생성
  * addData() 함수 : DB에 객체가 1개 이상이고, 데이터의 날짜가 오늘 날짜가 아닐때 오늘 날짜에 해당하는 객체 새로 생성
+ * checkTime() 함수 : 매 1시간 정각마다 운영시간인지 확인 후, 운영시간이 아니면 객체의 Status 상태를 변화 후 소켓에 전송
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class InitDataSchedule implements ApplicationRunner {
+public class ScheduleTask implements ApplicationRunner {
+
+    @Value("${relayUrl}")
+    private String relayUrl;
+
+    @Value("${operation.open-time}")
+    private String openTime; // 운영 시작 시간
+
+    @Value("${operation.close-time}")
+    private String closeTime; // 운영 종료 시간
 
     private final EventRepository eventRepository;
+
+    private final RecycleFn recycleFn;
+
+    private final SimpMessagingTemplate template;
+
 
     @Cacheable("entityCount")
     public Long getEntityCount() {
         return eventRepository.count();
+    }
+
+    @Cacheable("entity")
+    public Event getEntity(Long pk) {
+        return eventRepository.findById(pk).orElseThrow(() -> new CommonException("Data-001", HttpStatus.NOT_FOUND));
     }
 
     @Scheduled(cron = "1 0 0 * * *", zone = "Asia/Seoul")
@@ -88,6 +113,9 @@ public class InitDataSchedule implements ApplicationRunner {
             log.info("Event Table 내부에 데이터가 없습니다. 객체를 생성합니다.");
 
             Event event = Event.createOf(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
+            event.setRelayUrl(relayUrl);
+
+            log.info("테스트 - 상태값이 뭐가 나올까용 : {}", (event.getStatus().getDesc()));
 
             try {
                 eventRepository.save(event);
@@ -98,5 +126,36 @@ public class InitDataSchedule implements ApplicationRunner {
             }
         }
         addData();
+    }
+
+    // 1시간마다 운영시간인지 체크해서 현황판의 Status를 변화 시키는 Scheduler
+    @Scheduled(cron = "0 0 0/1 * * *")
+    public void checkTime() throws Exception {
+        Event event = null;
+
+        try {
+            event = getEntity(getEntityCount());
+        } catch (Exception e) {
+            log.error("객체 조회 실패", e);
+        }
+
+        // 운영시간 변환
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        LocalTime open = LocalTime.parse(openTime, timeFormatter);
+        LocalTime close = LocalTime.parse(closeTime, timeFormatter);
+
+        // Event 시간 변환
+        assert event != null;
+        String eventHMDate = recycleFn.hmFormatter(event.getEventTime());
+        LocalTime eventDateTime = LocalTime.parse(eventHMDate, timeFormatter);
+
+        if (!(eventDateTime.isAfter(open) && eventDateTime.isBefore(close))) {
+            log.error("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", openTime, closeTime, eventHMDate);
+            recycleFn.initiateCount(event);
+            event.setStatus(Status.NOT_OPERATING);
+
+            eventRepository.save(event);
+            template.convertAndSend("/count/data", event);
+        }
     }
 }
