@@ -32,22 +32,9 @@ import java.time.format.DateTimeFormatter;
 @Component
 @RequiredArgsConstructor
 public class ScheduleTask implements ApplicationRunner {
-
-    @Value("${relayUrl}")
-    private String relayUrl;
-
-    @Value("${operation.open-time}")
-    private String openTime; // 운영 시작 시간
-
-    @Value("${operation.close-time}")
-    private String closeTime; // 운영 종료 시간
-
     private final EventRepository eventRepository;
-
     private final RecycleFn recycleFn;
-
     private final SimpMessagingTemplate template;
-
 
     @Cacheable("entityCount")
     public Long getEntityCount() {
@@ -113,7 +100,6 @@ public class ScheduleTask implements ApplicationRunner {
             log.info("Event Table 내부에 데이터가 없습니다. 객체를 생성합니다.");
 
             Event event = Event.createOf(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
-            event.setRelayUrl(relayUrl);
 
             log.info("테스트 - 상태값이 뭐가 나올까용 : {}", (event.getStatus().getDesc()));
 
@@ -141,16 +127,16 @@ public class ScheduleTask implements ApplicationRunner {
 
         // 운영시간 변환
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        LocalTime open = LocalTime.parse(openTime, timeFormatter);
-        LocalTime close = LocalTime.parse(closeTime, timeFormatter);
+        assert event != null;
+        LocalTime open = LocalTime.parse(event.getOpenTime(), timeFormatter);
+        LocalTime close = LocalTime.parse(event.getCloseTime(), timeFormatter);
 
         // Event 시간 변환
-        assert event != null;
         String eventHMDate = recycleFn.hmFormatter(event.getEventTime());
         LocalTime eventDateTime = LocalTime.parse(eventHMDate, timeFormatter);
 
         if (!(eventDateTime.isAfter(open) && eventDateTime.isBefore(close))) {
-            log.error("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", openTime, closeTime, eventHMDate);
+            log.error("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", event.getOpenTime(), event.getCloseTime(), eventHMDate);
             recycleFn.initiateCount(event);
             event.setStatus(Status.NOT_OPERATING);
 
