@@ -38,6 +38,12 @@ public class Event {
     @Setter
     private String customStatus = ""; // 임의로 상태를 변경하고 싶을때 사용할 변수
 
+    @Setter
+    private String openTime = "09:00";
+
+    @Setter
+    private String closeTime = "18:00";
+
     private Event(LocalDateTime eventTime) {
         this.eventTime = eventTime;
     }
