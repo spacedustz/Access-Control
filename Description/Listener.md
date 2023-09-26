@@ -34,13 +34,6 @@ RabbitMQ의 Queue에 쌓인 데이터를 `@RabbitListener`를 사용해서 가�
 @Service  
 @RequiredArgsConstructor  
 public class RabbitTopicListener {  
-  
-    @Value("${operation.open-time}")  
-    private String openTime; // 운영 시작 시간  
-  
-    @Value("${operation.close-time}")  
-    private String closeTime; // 운영 종료 시간  
-  
     private String currentDate = String.valueOf(LocalDate.now());  
     private final EventRepository eventRepository;  
     private final SimpMessagingTemplate template;  
@@ -69,6 +62,9 @@ public class RabbitTopicListener {
             throw new CommonException("DATA-001 : 엔티티 조회 실패", HttpStatus.NOT_FOUND);  
         }  
   
+        String openTime = event.getOpenTime();  
+        String closeTime = event.getCloseTime();  
+  
         // 원본 데이터의 system_date 필드 변환  
         String originalDate = message.getSystem_date();  
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:s yyyy", Locale.ENGLISH);  
@@ -88,16 +84,17 @@ public class RabbitTopicListener {
         LocalTime close = LocalTime.parse(closeTime, timeFormatter);  
         LocalTime eventDateTime = LocalTime.parse(eventHMDate, timeFormatter);  
   
-        // 현재 재실 인원이 마이너스(-)로 가는 비정상적인 상황 발생 시 in/out count, occupancy 값 초기화  
-        validateOccupancy(event);  
-  
         // 날짜, 운영시간 검증, 현재 Entity와 이벤트로 넘어온 년월일이, 현재 시간과 맞는지 검증  
-        validateOperatingStatus(entityYMDDate, eventYMDDate, eventDateTime, open, close, openTime, closeTime, entityHMDate, event);  
+        validateOperatingStatus(entityYMDDate, eventYMDDate, open, close, eventDateTime, openTime, closeTime, entityHMDate, event);  
   
         // 이벤트로 넘어온 데이터의 Direction 가져오기  
         List<String> directions = message.getEvents().stream().map(it -> it.getExtra().getCrossing_direction()).toList();  
   
         for (String direction : directions) {  
+            // 날짜, 운영시간 검증, 현재 Entity와 이벤트로 넘어온 년월일이, 현재 시간과 맞는지 검증  
+            validateOperatingStatus(entityYMDDate, eventYMDDate, eventDateTime, open, close, openTime, closeTime, entityHMDate, event);  
+  
+            // 현재 재실 인원이 마이너스(-)로 가는 비정상적인 상황 발생 시 in/out count, occupancy 값 초기화  
             if (direction.equalsIgnoreCase("down")) {  
                 event.setInCount(event.getInCount() + 1);  
                 log.info("입장");  
@@ -106,11 +103,9 @@ public class RabbitTopicListener {
                 log.info("퇴장");  
             }  
   
-            // 날짜, 운영시간 검증, 현재 Entity와 이벤트로 넘어온 년월일이, 현재 시간과 맞는지 검증  
-            validateOperatingStatus(entityYMDDate, eventYMDDate, eventDateTime, open, close, openTime, closeTime, entityHMDate, event);  
-  
-            // 현재 재실 인원이 마이너스(-)로 가는 비정상적인 상황 발생 시 in/out count, occupancy 값 초기화  
-            validateOccupancy(event);  
+            if (event.getInCount() - event.getOutCount() < 0) {  
+                validateOccupancy(event);  
+            }  
   
             event.setOccupancy(event.getInCount() - event.getOutCount());  
             log.info("재실 인원/최대인원 : {}명/{}명", event.getOccupancy(), event.getMaxCount());  
@@ -126,19 +121,20 @@ public class RabbitTopicListener {
   
     // 재실 인원 검증 함수  
     public void validateOccupancy(Event event) {  
-        if (event.getOccupancy() < 0) {  
-            log.info("재실 인원 오류 - In/Out Count, Occupancy 초기화");  
-            recycleFn.initiateCount(event);  
-  
-            try {  
+        try {  
+            if (event.getOccupancy() < 0) {  
+                recycleFn.initiateCount(event);  
                 eventRepository.save(event);  
-            } catch (Exception e) {  
-                log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId());  
-            }  
-        }  
+                template.convertAndSend("/count/data", event);  
   
-        if (event.getOccupancy() >= 15) {  
-            log.info("인원 초과 - 재실 인원/최대인원 : {}명/{}명", event.getOccupancy(), event.getMaxCount());  
+                log.error("재실 인원 오류 - In/Out Count, Occupancy 초기화 - 초기화 된 Occupancy 값 : {}", event.getOccupancy());  
+            }  
+  
+            if (event.getOccupancy() >= event.getMaxCount()) {  
+                log.info("인원 초과 - 재실 인원/최대인원 : {}명/{}명", event.getOccupancy(), event.getMaxCount());  
+            }  
+        } catch (Exception e) {  
+            log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId(), e);  
         }  
     }  
   
@@ -153,7 +149,7 @@ public class RabbitTopicListener {
                                         String entityHMDate,  
                                         Event event) {  
   
-        if (!entityYMDDate.equals(currentDate) || !eventYMDDate.equals(currentDate) || (!(eventDateTime.isAfter(open) && eventDateTime.isBefore(close)))) {  
+        if (!entityYMDDate.equals(currentDate) || !eventYMDDate.equals(currentDate) || (!eventDateTime.isAfter(open) && eventDateTime.isBefore(close))) {  
             log.error("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", openTime, closeTime, entityHMDate);  
             recycleFn.initiateCount(event);  
             event.setStatus(Status.NOT_OPERATING);  
