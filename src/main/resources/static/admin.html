@@ -12,7 +12,23 @@
 <body>
 
 <div>
-    <h1>운영 시간 : <span id="time"></span></h1>
+    <h1>운영 시간</h1>
+    <span id="open"></span> - <span id="close"></span>
+
+    <h2>운영 시간 변경</h2>
+    <p style="font-size: 11px;"><strong>시작 시간</strong>
+        <input type="text" id="new-start-open" class="time" name="newOpenTime" placeholder="00~23">
+        <strong>:</strong>
+        <input type="text" id="new-start-close" class="time" name="newCloseTime" placeholder="00~59">
+    </p>
+
+    <p style="font-size: 11px;"><strong>종료 시간</strong>
+        <input type="text" id="new-end-open" class="time" name="newOpenTime" placeholder="00~23">
+        <strong>:</strong>
+        <input type="text" id="new-end-close" class="time" name="newCloseTime" placeholder="00~59">
+    </p>
+
+    <button type="button" onclick="updateOperationTime()">운영시간 변경</button>
 </div>
 
 <br>
@@ -28,9 +44,23 @@
 <br>
 
 <div>
-    <h2>최대 인원 변경</h2>
+    <h2>재실 인원 변경</h2>
     <p>현재 재실 인원 : <span id="count"></span></p>
-    <p>최대 인원 : <span id="max"></span></p>
+
+    <input type="text" id="increase-occupancy" name="IncreaseOccupancy" placeholder="증가 시킬 수 입력">
+    <button type="button" onclick="increaseOccupancy()">재실 인원 증가</button>
+
+    <br>
+
+    <input type="text" id="decrease-occupancy" name="DecreaseOccupancy" placeholder="감소 시킬 수 입력">
+    <button type="button" onclick="decreaseOccupancy()">재실 인원 감소</button>
+</div>
+
+<br>
+
+<div>
+    <h2>최대 인원 변경</h2>
+    <p>현재 최대 인원 : <span id="max"></span></p>
 
     <input type="text" id="new-max" name="newStatus" placeholder="변경할 최대 인원 수 입력">
     <button type="button" onclick="updateMaxCount()">최대 인원 변경</button>
@@ -40,10 +70,12 @@
 <br>
 
 <div>
-    <h2>Relay URL</h2>
-    <p><span id="url"></span></p>
-</div>
+    <h2>Relay URL 변경</h2>
+    <p>현재 Relay URL : <span id="url"></span></p>
 
+    <input type="text" id="new-relay" name="newRelay" placeholder="변경할 URL 입력">
+    <button type="button" onclick="updateRelayUrl()">URL 변경</button>
+</div>
 
 <script src="admin.js"></script>
 </body>
