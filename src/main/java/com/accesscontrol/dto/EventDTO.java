@@ -31,36 +31,24 @@ public class EventDTO {
         private int maxCount; // 최대 수용 인원
         private String customStatus; // Room 상태
         private String relayUrl; // Relay URL
+        private String status; // status
+        private String openTime; // 운영시작 시간
+        private String closeTime; // 운영 종료 시간
 
         private Response(int maxCount) {
             this.maxCount = maxCount;
         }
 
-        private Response(Long id, int occupancy, int maxCount, String customStatus) {
-            this.id = id;
-            this.occupancy = occupancy;
-            this.maxCount = maxCount;
-            this.customStatus = customStatus;
-        }
-
-        // 현황판용 응답 객체
-        public static EventDTO.Response fromEntityForViewer(com.accesscontrol.entity.Event entity) {
+        public static EventDTO.Response fromEntity(com.accesscontrol.entity.Event entity) {
             return new EventDTO.Response(
                     entity.getId(),
                     entity.getOccupancy(),
                     entity.getMaxCount(),
-                    entity.getStatus().getDesc()
-            );
-        }
-
-        // 관리자 페이지용 응답 객체
-        public static EventDTO.Response fromEntityForAdmin(com.accesscontrol.entity.Event entity) {
-            return new EventDTO.Response(
-                    entity.getId(),
-                    entity.getOccupancy(),
-                    entity.getMaxCount(),
+                    entity.getCustomStatus(),
+                    entity.getRelayUrl(),
                     entity.getStatus().getDesc(),
-                    entity.getRelayUrl()
+                    entity.getOpenTime(),
+                    entity.getCloseTime()
             );
         }
 
