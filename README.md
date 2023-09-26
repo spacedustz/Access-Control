@@ -7,15 +7,29 @@
 - [WebSocket & HttpHandshakeInterceptor](https://github.com/spacedustz/Access-Control/blob/main/Description/WebSocket.md)
 - [브라우저 <-> Spring 간단한 Rest API 작성](https://github.com/spacedustz/Access-Control/blob/main/Description/API.md)
 - [WebSocket에 접속해 실시간으로 데이터의 변화를 표시할 간단한 Spring Web View](https://github.com/spacedustz/Access-Control/blob/main/Description/View.md)
-- [현황판용 화면, 관리자용 값 수정 화면 분리](https://github.com/spacedustz/Access-Control/blob/main/Description/SeparateView.md)
+- [현황판용 페이지 만들기 - 데이터 동기화](https://github.com/spacedustz/Access-Control/blob/main/Description/DefaultPage.md)
+- [어드민용 관리자 페이지 만들기 - 데이터 동기화](https://github.com/spacedustz/Access-Control/blob/main/Description/AdminPage.md)
+- [결과물](https://github.com/spacedustz/Access-Control/blob/main/Description/Result.md)
 
 ---
 
 ## 📘 **예상 구현 흐름**
 
-특정 공간에 실시간 카메라가 존재하며, 사람 출입 시 카메라 내부 AI 엔진에서 TripWire Crossing MQTT 이벤트 데이터가 발생합니다.
+1. 특정 공간에 실시간 카메라가 존재하며, 사람 출입 시 카메라 내부 AI 엔진에서 TripWire Crossing MQTT 이벤트 데이터가 발생합니다.
 
-이 데이터를 가지고 특정 Room의 출입 현황을 나타내는 기능을 만듭니다.
+2. RabbitMQ를 설치하고 Exchange,Queue를 만든 후, Default Exchange -> Custom Exchange -> Routing Key -> Quorum Queue로 바인딩하고 MQTT 데이터를 큐에 쌓습니다.
+
+3. 이때 QuorumQueue의 `x-message-ttl` 등 옵션 파라미터는 요구사항에 맞게 큐의 설정을 미리 해줍니다.
+
+4. RabbitMQ에 쌓인 MQTT 데이터를 Spring에서 RabbitMQ Config를 이용해 Subscribe 해줍니다.
+
+5. Spring에서 받은 데이터는 RabbitMQ Config에 Bean으로 등록한 Converter로 내부적으로 파싱됩니다.
+
+6. RabbitMQ로부터 메시지를 가져올때마다 파싱된 데이터를 Json 계층 구조에 맞게 DTO에 담고 `RabbitTopicListener` 클래스에 나와있는 검증 로직들을 거쳐 엔티티화 -> DB 저장합니다.
+
+7. DB로 저장된 값을 웹소켓 채널을 여러개 열어 목적에 맞는 채널에 데이터를 흘려줍니다.
+
+8. 프론트단에서 Spring의 웹 소켓에 접속해 알맞는 채널에서 데이터들을 받아 변환 후 화면에 출력합니다.
 
 <br>
 
@@ -104,10 +118,10 @@ Spring Batch를 쓰려 했으나 너무 오버스펙인 것 같아 Spring 내부
 > 📌 **관리자용 UI에 표시해야 할 데이터 & 기능**
 
 - **(완료)** 운영시간 출력
-- 운영시간 변경 기능
+- **(완료)** 운영시간 변경 기능
 - **(완료)** 상태 메시지 변경 기능 - Status가 아닌 CustomStatus를 통해 출력
 - **(완료)** 최대 인원 변경 기능 - 현재 방안의 인원, 최대 인원 수 표시
-- Door API인 Relay URL 표시
+- **(완료)**Door API인 Relay URL 표시
 - **(완료)** 운영시간이 아닐 때 현재 방안의 인원 수 0으로 초기화 - ScheduleTask로 인해 1시간마다 주기적 실행
 - **(완료)** 현재 재실 인원이 마이너스 값이 나오거나 비정상 수치가 나올때 In/Out Count 초기화 로직 작성
 - **(완료)** 현재 재실 인원 변경 기능 추가 - 현재 인원 변경에 따른 In/Out Count 계산 로직 수정
@@ -151,3 +165,13 @@ Spring Batch를 쓰려 했으나 너무 오버스펙인 것 같아 Spring 내부
 **방안의 사람수가 15명 이상 일때 현재 방 상태 값, 색생 자동 변경 (스타일은 여전히 수정중)**
 
 ![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-3.png)
+
+<br>
+
+**최종 결과물 (스타일은 여전히 수정중)**
+
+- 왼쪽이 현황판용`(http://localhost:8090)`, 오른쪽이 어드민용 페이지`(http://localhost:8090/admin)` 입니다.
+- 오른쪽 창의 개발자 도구를 보면 웹 소켓 채널이 6개가 열려있고, 내부 로직을 작성할때 적절한 채널로 들어와서 화면을 실시간으로 업데이트 합니다.
+- 데이터가 업데이트 되면, 현황판용 & 어드민용 페이지에 둘다 실시간으로 변경된 값이 반영이 됩니다.
+
+![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-final.png)
