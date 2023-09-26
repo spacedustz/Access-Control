@@ -79,3 +79,7 @@ p {
     align-items: center;
     flex-direction: column;
 }
+
+.time {
+    width: 38px;
+}
