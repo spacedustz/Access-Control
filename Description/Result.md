@@ -30,3 +30,9 @@
 - 데이터가 업데이트 되면, 현황판용 & 어드민용 페이지에 둘다 실시간으로 변경된 값이 반영이 됩니다.
 
 ![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-final.png)
+
+<br>
+
+**(디자인 변경)**
+
+![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-done.png)
