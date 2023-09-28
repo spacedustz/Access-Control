@@ -123,6 +123,8 @@ function showStats(data) {
 function updateStatus() {
     let newStatusValue = document.getElementById('new-status').value;
     fetchJson(httpUrl + '/update-status?status=' + newStatusValue, 'PATCH', {})
+
+    document.getElementById('new-status').value = null;
     return false; // 기본 양식 제출 방지
 }
 
@@ -130,6 +132,8 @@ function updateStatus() {
 function updateMaxCount() {
     let newMaxCountValue = document.getElementById('new-max').value;
     fetchJson(httpUrl + '/update-max?max=' + newMaxCountValue, 'PATCH', {})
+
+    document.getElementById('new-max').value = null;
     return false; // 기본 양식 제출 방지
 }
 
@@ -140,7 +144,9 @@ function increaseOccupancy() {
     fetchJson(httpUrl + '/increase-occupancy?num=' + newOccupancy, 'PATCH', {})
         .then(data => {
             console.log('재실 인원 증가 완료 - 증가한 수치 : ', newOccupancy)
-        })
+        });
+
+    document.getElementById('increase-occupancy').value = null;
 }
 
 // 재실 인원 감소 함수
@@ -150,7 +156,9 @@ function decreaseOccupancy() {
     fetchJson(httpUrl + '/decrease-occupancy?num=' + newOccupancy, 'PATCH', {})
         .then(data => {
             console.log('재실 인원 감소 완료 - 감소한 수치 : ', newOccupancy)
-        })
+        });
+
+    document.getElementById('decrease-occupancy').value = null;
 }
 
 // 운영 시간 변경 함수
@@ -177,6 +185,11 @@ function updateOperationTime() {
             console.error('운영 시간 변경 오류:', error);
         });
 
+    document.getElementById('new-start-open').value = null;
+    document.getElementById('new-start-close').value = null;
+    document.getElementById('new-end-open').value = null;
+    document.getElementById('new-end-close').value = null;
+
     return false; // 기본 양식 제출 방지
 }
 
@@ -186,6 +199,8 @@ function updateRelayUrl() {
 
     fetchJson(httpUrl + '/relay?url=' + newUrl, 'PATCH', {})
         .then(() => console.log("Relay URL 변경 - ", newUrl));
+
+    document.getElementById('new-relay').value = null;
 }
 
 /* 데이터 값 출력 함수들 */
