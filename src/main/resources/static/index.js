@@ -25,6 +25,8 @@ stompClient.connect({}, (frame) => {
         let entity = JSON.parse(data.body);
         roomInfo.customStatus = entity.customStatus
         displayStatus(roomInfo.customStatus);
+        let coloredStatus = document.getElementById('status');
+        coloredStatus.style.color = '#ff0000';
 
         console.log('Custom 상태 업데이트 : ', entity.customStatus);
     });
@@ -104,11 +106,11 @@ function displayStatus(status, occupancy, maxCount) {
     let coloredStatus = document.getElementById('status');
 
     if (occupancy <= 9) {
-        coloredStatus.style.color = 'lawngreen';
+        coloredStatus.style.color = '#1494ff';
     } else if (occupancy >= 10 && occupancy < 15) {
-        coloredStatus.style.color = 'yellow';
+        coloredStatus.style.color = '#ff6012';
     } else if (occupancy >= maxCount) {
-        coloredStatus.style.color = 'red';
+        coloredStatus.style.color = '#ff0000';
     }
 
 }
