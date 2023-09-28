@@ -7,87 +7,87 @@
 - 그 값을 소켓을 통해 index.js로 넘겨 전광판용 화면에 실시간으로 적용되게 하였습니다.
 
 ```html
-<!DOCTYPE html>  
-<html>  
-<head>  
-    <meta charset="UTF-8">  
-    <title>입장 인원 카운트</title>  
-  
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>  
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>  
-    <link rel="stylesheet" href="style.css">  
-</head>  
-  
-<body>  
-  
-<div>  
-    <h1>운영 시간</h1>  
-    <span id="open"></span> - <span id="close"></span>  
-  
-    <h2>운영 시간 변경</h2>  
-    <p style="font-size: 11px;"><strong>시작 시간</strong>  
-        <input type="text" id="new-start-open" class="time" name="newOpenTime" placeholder="00~23">  
-        <strong>:</strong>  
-        <input type="text" id="new-start-close" class="time" name="newCloseTime" placeholder="00~59">  
-    </p>  
-  
-    <p style="font-size: 11px;"><strong>종료 시간</strong>  
-        <input type="text" id="new-end-open" class="time" name="newOpenTime" placeholder="00~23">  
-        <strong>:</strong>  
-        <input type="text" id="new-end-close" class="time" name="newCloseTime" placeholder="00~59">  
-    </p>  
-  
-    <button type="button" onclick="updateOperationTime()">운영시간 변경</button>  
-</div>  
-  
-<br>  
-  
-<div>  
-    <h2>상태 메시지 변경</h2>  
-    <p>현재 상태 메시지 : <span id="status"></span></p>  
-  
-    <input type="text" id="new-status" name="newStatus" placeholder="새로운 상태 입력">  
-    <button type="button" onclick="updateStatus()">상태 변경</button>  
-</div>  
-  
-<br>  
-  
-<div>  
-    <h2>재실 인원 변경</h2>  
-    <p>현재 재실 인원 : <span id="count"></span></p>  
-  
-    <input type="text" id="increase-occupancy" name="IncreaseOccupancy" placeholder="증가 시킬 수 입력">  
-    <button type="button" onclick="increaseOccupancy()">재실 인원 증가</button>  
-  
-    <br>  
-  
-    <input type="text" id="decrease-occupancy" name="DecreaseOccupancy" placeholder="감소 시킬 수 입력">  
-    <button type="button" onclick="decreaseOccupancy()">재실 인원 감소</button>  
-</div>  
-  
-<br>  
-  
-<div>  
-    <h2>최대 인원 변경</h2>  
-    <p>현재 최대 인원 : <span id="max"></span></p>  
-  
-    <input type="text" id="new-max" name="newStatus" placeholder="변경할 최대 인원 수 입력">  
-    <button type="button" onclick="updateMaxCount()">최대 인원 변경</button>  
-  
-</div>  
-  
-<br>  
-  
-<div>  
-    <h2>Relay URL 변경</h2>  
-    <p>현재 Relay URL : <span id="url"></span></p>  
-  
-    <input type="text" id="new-relay" name="newRelay" placeholder="변경할 URL 입력">  
-    <button type="button" onclick="updateRelayUrl()">URL 변경</button>  
-</div>  
-  
-<script src="admin.js"></script>  
-</body>  
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>입장 인원 카운트</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body style="background-color: gray">
+
+<div>
+    <h1>운영 시간</h1>
+    <span id="open"></span> - <span id="close"></span>
+
+    <h2>운영 시간 변경</h2>
+    <p style="font-size: 11px;"><strong>시작 시간</strong>
+        <input type="text" id="new-start-open" class="time" name="newOpenTime" placeholder="00~23">
+        <strong>:</strong>
+        <input type="text" id="new-start-close" class="time" name="newCloseTime" placeholder="00~59">
+    </p>
+
+    <p style="font-size: 11px;"><strong>종료 시간</strong>
+        <input type="text" id="new-end-open" class="time" name="newOpenTime" placeholder="00~23">
+        <strong>:</strong>
+        <input type="text" id="new-end-close" class="time" name="newCloseTime" placeholder="00~59">
+    </p>
+
+    <button type="button" onclick="updateOperationTime()">운영시간 변경</button>
+</div>
+
+<br>
+
+<div>
+    <h2>상태 메시지 변경</h2>
+    <p>현재 상태 메시지 : <span id="status"></span></p>
+
+    <input type="text" id="new-status" name="newStatus" placeholder="새로운 상태 입력">
+    <button type="button" onclick="updateStatus()">상태 변경</button>
+</div>
+
+<br>
+
+<div>
+    <h2>재실 인원 변경</h2>
+    <p>현재 재실 인원 : <span id="count"></span></p>
+
+    <input type="text" id="increase-occupancy" name="IncreaseOccupancy" placeholder="증가 시킬 수 입력">
+    <button type="button" onclick="increaseOccupancy()">재실 인원 증가</button>
+
+    <br>
+
+    <input type="text" id="decrease-occupancy" name="DecreaseOccupancy" placeholder="감소 시킬 수 입력">
+    <button type="button" onclick="decreaseOccupancy()">재실 인원 감소</button>
+</div>
+
+<br>
+
+<div>
+    <h2>최대 인원 변경</h2>
+    <p>현재 최대 인원 : <span id="max"></span></p>
+
+    <input type="text" id="new-max" name="newStatus" placeholder="변경할 최대 인원 수 입력">
+    <button type="button" onclick="updateMaxCount()">최대 인원 변경</button>
+
+</div>
+
+<br>
+
+<div>
+    <h2>Relay URL 변경</h2>
+    <p>현재 Relay URL : <span id="url"></span></p>
+
+    <input type="text" id="new-relay" name="newRelay" placeholder="변경할 URL 입력">
+    <button type="button" onclick="updateRelayUrl()">URL 변경</button>
+</div>
+
+<script src="admin.js"></script>
+</body>
 </html>
 ```
 
@@ -217,6 +217,8 @@ function showStats(data) {
 function updateStatus() {  
     let newStatusValue = document.getElementById('new-status').value;  
     fetchJson(httpUrl + '/update-status?status=' + newStatusValue, 'PATCH', {})  
+  
+    document.getElementById('new-status').value = null;  
     return false; // 기본 양식 제출 방지  
 }  
   
@@ -224,6 +226,8 @@ function updateStatus() {
 function updateMaxCount() {  
     let newMaxCountValue = document.getElementById('new-max').value;  
     fetchJson(httpUrl + '/update-max?max=' + newMaxCountValue, 'PATCH', {})  
+  
+    document.getElementById('new-max').value = null;  
     return false; // 기본 양식 제출 방지  
 }  
   
@@ -234,7 +238,9 @@ function increaseOccupancy() {
     fetchJson(httpUrl + '/increase-occupancy?num=' + newOccupancy, 'PATCH', {})  
         .then(data => {  
             console.log('재실 인원 증가 완료 - 증가한 수치 : ', newOccupancy)  
-        })  
+        });  
+  
+    document.getElementById('increase-occupancy').value = null;  
 }  
   
 // 재실 인원 감소 함수  
@@ -244,7 +250,9 @@ function decreaseOccupancy() {
     fetchJson(httpUrl + '/decrease-occupancy?num=' + newOccupancy, 'PATCH', {})  
         .then(data => {  
             console.log('재실 인원 감소 완료 - 감소한 수치 : ', newOccupancy)  
-        })  
+        });  
+  
+    document.getElementById('decrease-occupancy').value = null;  
 }  
   
 // 운영 시간 변경 함수  
@@ -271,6 +279,11 @@ function updateOperationTime() {
             console.error('운영 시간 변경 오류:', error);  
         });  
   
+    document.getElementById('new-start-open').value = null;  
+    document.getElementById('new-start-close').value = null;  
+    document.getElementById('new-end-open').value = null;  
+    document.getElementById('new-end-close').value = null;  
+  
     return false; // 기본 양식 제출 방지  
 }  
   
@@ -280,6 +293,8 @@ function updateRelayUrl() {
   
     fetchJson(httpUrl + '/relay?url=' + newUrl, 'PATCH', {})  
         .then(() => console.log("Relay URL 변경 - ", newUrl));  
+  
+    document.getElementById('new-relay').value = null;  
 }  
   
 /* 데이터 값 출력 함수들 */  
@@ -347,8 +362,13 @@ button:hover {
 }  
   
 body {  
-    background-color: slategray;  
+    background-color: #001228;  
     /*background-image: url(back.png);*/  
+    display: flex;  
+    flex-direction: column;  
+    align-items: center; /* 수직 정렬 (가운데) */  
+    justify-content: center; /* 수평 정렬 (가운데) */  
+    height: 100vh; /* 화면 높이에 맞추어 정렬 */
 }  
   
 /* Input */  
@@ -365,53 +385,96 @@ section {
 /* Div */  
 div {  
     text-align: center;  
-    margin-bottom:.8rem;  
-    padding:.8rem;  
-    border-radius:.3rem;  
-    box-shadow:.1rem .1rem .3rem rgba(0,0,0,.2);  
+    margin-bottom: .8rem;  
+    padding: .8rem;  
+    border-radius: .3rem;  
+    box-shadow: .1rem .1rem .3rem rgba(0, 0, 0, .2);  
 }  
   
 /* Span */  
 span {  
-    font-weight:bold  
+    font-weight: bold  
 }  
   
 /* Paragraph */  
 p {  
-    font-size :18px  
+    font-size: 18px  
 }  
   
 .view {  
-    color: snow;  
+    color: white;  
+    font-size: 45px;  
+}  
+  
+.status {  
+    font-size: 110px;  
+    font-weight: bold;  
 }  
   
 .text-occupancy {  
     vertical-align: top;  
-    background-color: #45a049;  
+    background-color: white;  
     padding: 7px;  
-    color: black;  
+    color: #001228;  
     margin-right: 15px;  
     margin-left: 15px;  
     border-radius: 10px;  
-    font-size: 30px;  
+    font-size: 70px;  
+    width: 200px;  
+    height: 100px;  
+    font-weight: bold;  
 }  
   
 .text-max {  
     vertical-align: top;  
-    background-color: #45a049;  
+    background-color: white;  
     padding: 7px;  
-    color: black;  
+    color: #001228;  
     margin-right: 15px;  
     margin-left: 15px;  
     border-radius: 10px;  
-    font-size: 30px;  
+    font-size: 70px;  
+    width: 200px;  
+    height: 100px;  
+    font-weight: bold;  
 }  
   
 .flex-container {  
     display: flex;  
     justify-content: center;  
     align-items: center;  
+    flex-direction: row;  
+    margin: 30px;  
+}  
+  
+.flex-item1 {  
+    display: flex;  
+    justify-content: center;  
+    align-items: center;  
     flex-direction: column;  
+    margin-top: 20px;  
+    height: 10vh;  
+    padding-top: 50px;  
+}  
+  
+.flex-item2 {  
+    display: flex;  
+    justify-content: center;  
+    align-items: center;  
+    flex-direction: column;  
+    margin-top: 20px;  
+    height: 10vh;  
+    padding-top: 50px;  
+}  
+  
+.flex-container h2 {  
+    margin-right: 35px;  
+}  
+  
+.flex-container p {  
+    margin-right: 60px;  
+    font-size: 64px;  
+    color: white;  
 }  
   
 .time {  
