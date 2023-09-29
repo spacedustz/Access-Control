@@ -174,3 +174,9 @@ Spring Batch를 쓰려 했으나 너무 오버스펙인 것 같아 Spring 내부
 - 데이터가 업데이트 되면, 현황판용 & 어드민용 페이지에 둘다 실시간으로 변경된 값이 반영이 됩니다.
 
 ![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-final.png)
+
+<br>
+
+**디자인 최종 수정**
+
+![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-finish.png)
