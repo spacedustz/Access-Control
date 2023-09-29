@@ -52,9 +52,14 @@ p {
     font-size: 18px
 }
 
+.status-img {
+    width: 250px;
+    height: 250px;
+}
+
 .view {
     color: white;
-    font-size: 45px;
+    font-size: 40px;
 }
 
 .status {
@@ -71,8 +76,8 @@ p {
     margin-left: 15px;
     border-radius: 10px;
     font-size: 70px;
-    width: 200px;
-    height: 100px;
+    width: 230px;
+    height: 150px;
     font-weight: bold;
 }
 
@@ -85,8 +90,8 @@ p {
     margin-left: 15px;
     border-radius: 10px;
     font-size: 70px;
-    width: 200px;
-    height: 100px;
+    width: 230px;
+    height: 150px;
     font-weight: bold;
 }
 
@@ -106,6 +111,7 @@ p {
     margin-top: 20px;
     height: 10vh;
     padding-top: 50px;
+    margin-right: 30px;
 }
 
 .flex-item2 {
@@ -130,4 +136,25 @@ p {
 
 .time {
     width: 38px;
+}
+
+.admin-color {
+    color: white;
+}
+
+.admin-container1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    margin-left: 40px;
+}
+
+.admin-container2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    margin-left: 40px;
+    padding: 40px;
 }
