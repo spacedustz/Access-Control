@@ -100,8 +100,8 @@ public class ScheduleTask implements ApplicationRunner {
             log.info("Event Table 내부에 데이터가 없습니다. 객체를 생성합니다.");
 
             Event event = Event.createOf(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
-
-            log.info("테스트 - 상태값이 뭐가 나올까용 : {}", (event.getStatus().getDesc()));
+//            event.setRelayUrl("http://192.168.0.7/index.html?p0=1000");
+            event.setRelayUrl("http://localhost:8100/test/post");
 
             try {
                 eventRepository.save(event);

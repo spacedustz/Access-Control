@@ -9,10 +9,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -28,6 +31,7 @@ public class RabbitTopicListener {
     private final EventRepository eventRepository;
     private final SimpMessagingTemplate template;
     private final RecycleFn recycleFn;
+    private final RestTemplate restTemplate;
 
     @Cacheable("entityCount")
     public Long getEntityCount() {
@@ -57,7 +61,7 @@ public class RabbitTopicListener {
 
         // 원본 데이터의 system_date 필드 변환
         String originalDate = message.getSystem_date();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:s yyyy", Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM  d HH:mm:ss yyyy", Locale.ENGLISH);
         LocalDateTime convertedDate = LocalDateTime.parse(originalDate, formatter);
 
         // DB에 저장된 데이터의 날짜 나누기
@@ -106,7 +110,17 @@ public class RabbitTopicListener {
 
             // Web Socket Session 에 Event 객체 전달
             template.convertAndSend("/count/data", event);
+            requestApi(event);
         }
+    }
+
+    // Door API에 HTTP Request 요청
+    public void requestApi(Event event) {
+        // URL 설정
+        String url = event.getRelayUrl();
+
+        // 요청 보내기
+        restTemplate.postForLocation(url, null);
     }
 
     // 재실 인원 검증 함수
