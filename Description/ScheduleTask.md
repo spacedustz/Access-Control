@@ -66,7 +66,8 @@ public class ScheduleTask implements ApplicationRunner {
                 log.info("현재 날짜 : {} - 데이터 날짜 : {}", currentDate, storedEvent.getEventTime());  
                 Event event = Event.createOf(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));  
   
-                try {  
+                try {
+		                event.setRelayUrl("http://localhost:8100/test/post");
                     eventRepository.save(event);  
                     log.info("기존 데이터의 날짜와 현재 시간이 불일치합니다, 새로운 객체를 생성 합니다. - Event ID: {}", event.getId());  
                 } catch (Exception e) {  
@@ -90,6 +91,7 @@ public class ScheduleTask implements ApplicationRunner {
             log.info("Event Table 내부에 데이터가 없습니다. 객체를 생성합니다.");  
   
             Event event = Event.createOf(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));  
+            event.setRelayUrl("http://localhost:8100/test/post");
   
             log.info("테스트 - 상태값이 뭐가 나올까용 : {}", (event.getStatus().getDesc()));  
   
