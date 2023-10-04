@@ -14,8 +14,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -92,6 +90,7 @@ public class RabbitTopicListener {
             if (direction.equalsIgnoreCase("down")) {
                 event.setInCount(event.getInCount() + 1);
                 log.info("입장");
+                requestApi(event); // Request Door API
             } else if (direction.equalsIgnoreCase("up")) {
                 event.setOutCount(event.getOutCount() + 1);
                 log.info("퇴장");
@@ -110,7 +109,6 @@ public class RabbitTopicListener {
 
             // Web Socket Session 에 Event 객체 전달
             template.convertAndSend("/count/data", event);
-            requestApi(event);
         }
     }
 
