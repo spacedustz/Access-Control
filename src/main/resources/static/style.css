@@ -20,6 +20,7 @@ body {
     align-items: center; /* 수직 정렬 (가운데) */
     justify-content: center; /* 수평 정렬 (가운데) */
     height: 100vh; /* 화면 높이에 맞추어 정렬 */
+    overflow: hidden;
 }
 
 /* Input */

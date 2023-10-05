@@ -79,11 +79,11 @@ function updateRoomInfo(data) {
             displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
             break;
         case "MEDIUM":
-            roomInfo.status  = "혼잡합니다.";
+            roomInfo.status  = "조금 혼잡합니다.";
             displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
             break;
         case "HIGH":
-            roomInfo.status  = "만실입니다.";
+            roomInfo.status  = "입장이 불가합니다.";
             displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
             break;
         case "NOT_OPERATING":
@@ -115,8 +115,8 @@ function displayStatus(status, occupancy, maxCount) {
         coloredStatus.style.color = '#1494ff';
         statusImg.src = './img/Blue.png';
     } else if (occupancy >= 10 && occupancy < maxCount) {
-        coloredStatus.style.color = '#ff6012';
-        statusImg.src = './img/Orange.png';
+        coloredStatus.style.color = '#E6EC20';
+        statusImg.src = './img/Yellow.png';
     } else if (occupancy >= maxCount) {
         coloredStatus.style.color = '#ff0000';
         statusImg.src = './img/Red.png';
