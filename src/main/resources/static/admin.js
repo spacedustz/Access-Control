@@ -99,11 +99,11 @@ function showStats(data) {
             displayStatus(roomInfo.status);
             break;
         case "MEDIUM":
-            roomInfo.status  = "혼잡합니다.";
+            roomInfo.status  = "조금 혼잡합니다.";
             displayStatus(roomInfo.status);
             break;
         case "HIGH":
-            roomInfo.status  = "만실입니다.";
+            roomInfo.status  = "입장이 불가합니다.";
             displayStatus(roomInfo.status);
             break;
         case "NOT_OPERATING":
