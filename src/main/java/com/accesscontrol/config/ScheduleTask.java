@@ -115,7 +115,7 @@ public class ScheduleTask implements ApplicationRunner {
     }
 
     // 1시간마다 운영시간인지 체크해서 현황판의 Status를 변화 시키는 Scheduler
-    @Scheduled(cron = "0 0 0/1 * * *")
+    @Scheduled(cron = "0 0/1 * * * *")
     public void checkTime() throws Exception {
         Event event = null;
 
