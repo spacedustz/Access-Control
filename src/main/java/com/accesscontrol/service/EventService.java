@@ -75,7 +75,7 @@ public class EventService {
 
         try {
             event = getEntity(getEntityCount());
-            event.setOutCount(event.getOutCount() + num);
+            event.setInCount(event.getOutCount() + num);
             event.setOccupancy(event.getOccupancy() + num);
 
             recycleFn.autoUpdateStatus(event);
@@ -93,7 +93,7 @@ public class EventService {
 
         try {
             event = getEntity(getEntityCount());
-            event.setInCount(event.getInCount() - num);
+            event.setOutCount(event.getInCount() - num);
             event.setOccupancy(event.getOccupancy() - num);
 
             recycleFn.autoUpdateStatus(event);
