@@ -59,7 +59,7 @@ public class RabbitTopicListener {
 
         // 원본 데이터의 system_date 필드 변환
         String originalDate = message.getSystem_date();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM  d HH:mm:ss yyyy", Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss yyyy", Locale.ENGLISH);
         LocalDateTime convertedDate = LocalDateTime.parse(originalDate, formatter);
 
         // DB에 저장된 데이터의 날짜 나누기
@@ -118,7 +118,7 @@ public class RabbitTopicListener {
         String url = event.getRelayUrl();
 
         // 요청 보내기
-        restTemplate.postForLocation(url, null);
+        restTemplate.getForEntity(url, Void.class);
     }
 
     // 재실 인원 검증 함수
