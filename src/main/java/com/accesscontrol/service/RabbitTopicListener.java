@@ -8,7 +8,6 @@ import com.accesscontrol.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -31,16 +30,6 @@ public class RabbitTopicListener {
     private final RecycleFn recycleFn;
     private final RestTemplate restTemplate;
 
-    @Cacheable("entityCount")
-    public Long getEntityCount() {
-        return eventRepository.count();
-    }
-
-    @Cacheable("entity")
-    public Event getEntity(Long pk) {
-        return eventRepository.findById(pk).orElseThrow(() -> new CommonException("Data-001", HttpStatus.NOT_FOUND));
-    }
-
     // MQTT 데이터에서 들어오는 system_date의 날짜 형식은 "EEE MMM dd HH:mm:ss yyyy" 입니다.
     // 이 String 타입 날짜 데이터를 "년-월-일T시-분-초"의 LocalDateTime으로 변환해서 엔티티화 합니다.
     @RabbitListener(queues = "q.frame")
@@ -48,7 +37,7 @@ public class RabbitTopicListener {
         Event event = null;
 
         try {
-            event = getEntity(getEntityCount());
+            event = recycleFn.getEntity(recycleFn.getEntityCount());
         } catch (Exception e) {
             log.error("DATA-001 : 엔티티 조회 실패");
             throw new CommonException("DATA-001 : 엔티티 조회 실패", HttpStatus.NOT_FOUND);
@@ -61,6 +50,8 @@ public class RabbitTopicListener {
         String originalDate = message.getSystem_date();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss yyyy", Locale.ENGLISH);
         LocalDateTime convertedDate = LocalDateTime.parse(originalDate, formatter);
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM  d HH:mm:ss yyyy", Locale.ENGLISH);
+//        LocalDateTime convertedDate = LocalDateTime.parse(originalDate, formatter);
 
         // DB에 저장된 데이터의 날짜 나누기
         String entityYMDDate = recycleFn.ymdFormatter(event.getEventTime()); // YYYY-MM-DD
@@ -72,20 +63,17 @@ public class RabbitTopicListener {
 
         // 이벤트로 넘어온 데이터의 시간이 운영시간 범위에 존재하는지 확인하기 위한 LocalTime 타입 변환
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        LocalTime open = LocalTime.parse(openTime, timeFormatter);
-        LocalTime close = LocalTime.parse(closeTime, timeFormatter);
+        LocalTime open = LocalTime.parse(openTime, timeFormatter); // event.getOpenTime()
+        LocalTime close = LocalTime.parse(closeTime, timeFormatter); // event.getCloseTime()
         LocalTime eventDateTime = LocalTime.parse(eventHMDate, timeFormatter);
 
         // 날짜, 운영시간 검증, 현재 Entity와 이벤트로 넘어온 년월일이, 현재 시간과 맞는지 검증
-        validateOperatingStatus(entityYMDDate, eventYMDDate, open, close, eventDateTime, openTime, closeTime, entityHMDate, event);
+        validateOperatingStatus(entityYMDDate, eventYMDDate, open, close, eventDateTime, openTime, closeTime, event);
 
         // 이벤트로 넘어온 데이터의 Direction 가져오기
         List<String> directions = message.getEvents().stream().map(it -> it.getExtra().getCrossing_direction()).toList();
 
         for (String direction : directions) {
-            // 날짜, 운영시간 검증, 현재 Entity와 이벤트로 넘어온 년월일이, 현재 시간과 맞는지 검증
-            validateOperatingStatus(entityYMDDate, eventYMDDate, eventDateTime, open, close, openTime, closeTime, entityHMDate, event);
-
             // 현재 재실 인원이 마이너스(-)로 가는 비정상적인 상황 발생 시 in/out count, occupancy 값 초기화
             if (direction.equalsIgnoreCase("down")) {
                 event.setInCount(event.getInCount() + 1);
@@ -127,7 +115,6 @@ public class RabbitTopicListener {
             if (event.getOccupancy() < 0) {
                 recycleFn.initiateCount(event);
                 eventRepository.save(event);
-                template.convertAndSend("/count/data", event);
 
                 log.error("재실 인원 오류 - In/Out Count, Occupancy 초기화 - 초기화 된 Occupancy 값 : {}", event.getOccupancy());
             }
@@ -135,6 +122,8 @@ public class RabbitTopicListener {
             if (event.getOccupancy() >= event.getMaxCount()) {
                 log.info("인원 초과 - 재실 인원/최대인원 : {}명/{}명", event.getOccupancy(), event.getMaxCount());
             }
+
+            template.convertAndSend("/count/data", event);
         } catch (Exception e) {
             log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId(), e);
         }
@@ -148,19 +137,26 @@ public class RabbitTopicListener {
                                         LocalTime eventDateTime,
                                         String openTime,
                                         String closeTime,
-                                        String entityHMDate,
                                         Event event) {
 
-        if (!entityYMDDate.equals(currentDate) || !eventYMDDate.equals(currentDate) || (!eventDateTime.isAfter(open) && eventDateTime.isBefore(close))) {
-            log.error("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", openTime, closeTime, entityHMDate);
-            recycleFn.initiateCount(event);
-            event.setStatus(Status.NOT_OPERATING);
-
-            try {
-                eventRepository.save(event);
-            } catch (Exception e) {
-                log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId());
-            }
+        // 이벤트 데이터의 날짜 검증
+        if (!eventYMDDate.equals(currentDate) || (!entityYMDDate.equals(currentDate))) {
+            log.error("데이터의 날짜가 오늘 날짜가 아닙니다. - 현재 날짜 : {}, 데이터의 날짜 : {}", currentDate, eventYMDDate);
         }
+
+        // 이벤트 데이터의 운영 시간 검증
+        if (!eventDateTime.isAfter(open) && !eventDateTime.isBefore(close)) {
+            event.setStatus(Status.NOT_OPERATING);
+            log.error("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", openTime, closeTime, eventDateTime);
+        }
+
+        try {
+            eventRepository.save(event);
+        } catch (Exception e) {
+            log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId());
+        }
+
+        // Web Socket Session 에 Event 객체 전달
+        template.convertAndSend("/count/data", event);
     }
 }
