@@ -73,12 +73,10 @@ p {
     background-color: white;
     padding: 7px;
     color: #001228;
-    margin-right: 15px;
-    margin-left: 15px;
     border-radius: 10px;
     font-size: 70px;
-    width: 230px;
-    height: 150px;
+    width: 280px;
+    height: 160px;
     font-weight: bold;
 }
 
@@ -87,12 +85,10 @@ p {
     background-color: white;
     padding: 7px;
     color: #001228;
-    margin-right: 15px;
-    margin-left: 15px;
     border-radius: 10px;
     font-size: 70px;
-    width: 230px;
-    height: 150px;
+    width: 280px;
+    height: 160px;
     font-weight: bold;
 }
 
@@ -123,16 +119,6 @@ p {
     margin-top: 20px;
     height: 10vh;
     padding-top: 50px;
-}
-
-.flex-container h2 {
-    margin-right: 35px;
-}
-
-.flex-container p {
-    margin-right: 60px;
-    font-size: 64px;
-    color: white;
 }
 
 .time {
