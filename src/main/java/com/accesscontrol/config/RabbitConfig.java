@@ -43,9 +43,9 @@ public class RabbitConfig {
 
     // Rabbit Template 생성
     @Bean
-    RabbitTemplate template(org.springframework.amqp.rabbit.connection.ConnectionFactory factory, MessageConverter converter) {
-        RabbitTemplate template = new RabbitTemplate(factory);
-        template.setMessageConverter(converter);
+    RabbitTemplate template() {
+        RabbitTemplate template = new RabbitTemplate(factory());
+        template.setMessageConverter(converter());
 
         return template;
     }
