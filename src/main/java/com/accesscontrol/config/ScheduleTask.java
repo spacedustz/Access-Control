@@ -114,36 +114,20 @@ public class ScheduleTask implements ApplicationRunner {
         addData();
     }
 
-    // 1시간마다 운영시간인지 체크해서 현황판의 Status를 변화 시키는 Scheduler
-    @Scheduled(cron = "0 0/1 * * * *")
-    public void checkTime() throws Exception {
-        String currentDate = String.valueOf(LocalDate.now());
+    // 10초 마다 운영시간인지 체크해서 현황판의 Status를 변화 시키는 Scheduler
+    @Scheduled(cron = "0/10 * * * * *")
+    public void checkTime() {
 
         Event event = null;
 
         try {
             event = getEntity(getEntityCount());
+            recycleFn.validateOperationTime(event);
+            eventRepository.save(event);
         } catch (Exception e) {
             log.error("객체 조회 실패", e);
         }
-
-        // 운영시간 변환
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        assert event != null;
-        LocalTime open = LocalTime.parse(event.getOpenTime(), timeFormatter);
-        LocalTime close = LocalTime.parse(event.getCloseTime(), timeFormatter);
-
-        // Event 시간 변환
-        String eventHMDate = recycleFn.hmFormatter(event.getEventTime());
-        LocalTime eventDateTime = LocalTime.parse(eventHMDate, timeFormatter);
-
-        if (!(eventDateTime.isAfter(open) && eventDateTime.isBefore(close))) {
-            log.error("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", event.getOpenTime(), event.getCloseTime(), eventHMDate);
-            recycleFn.initiateCount(event);
-            event.setStatus(Status.NOT_OPERATING);
-
-            eventRepository.save(event);
             template.convertAndSend("/count/data", event);
-        }
+
     }
 }
