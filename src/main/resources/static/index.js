@@ -92,7 +92,6 @@ function updateRoomInfo(data) {
             break;
     }
     displayMaxCount(roomInfo.maxCount);
-    displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
 }
 
 // 최대 인원
@@ -114,12 +113,26 @@ function displayStatus(status, occupancy, maxCount) {
     if (occupancy <= 9) {
         coloredStatus.style.color = '#1494ff';
         statusImg.src = './img/Blue.png';
+        document.getElementById('view-occupancy').style.color = '#1494ff';
+        document.getElementById('view-max').style.color = '#1494ff';
     } else if (occupancy >= 10 && occupancy < maxCount) {
         coloredStatus.style.color = '#E6EC20';
         statusImg.src = './img/Yellow.png';
+        document.getElementById('view-occupancy').style.color = '#E6EC20';
+        document.getElementById('view-max').style.color = '#E6EC20';
     } else if (occupancy >= maxCount) {
         coloredStatus.style.color = '#ff0000';
         statusImg.src = './img/Red.png';
+        document.getElementById('view-occupancy').style.color = '#ff0000';
+        document.getElementById('view-max').style.color = '#ff0000';
+    }
+
+
+    if (document.getElementById('status').innerText === '운영시간이 아닙니다.') {
+        coloredStatus.style.color = '#ff0000';
+        statusImg.src = './img/Red.png';
+        document.getElementById('view-occupancy').style.color = '#ff0000';
+        document.getElementById('view-max').style.color = '#ff0000';
     }
 }
 
