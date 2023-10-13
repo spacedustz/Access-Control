@@ -53,6 +53,17 @@ p {
     font-size: 18px
 }
 
+.admin-body {
+    background-color: #001228;
+    /*background-image: url(back.png);*/
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 수직 정렬 (가운데) */
+    justify-content: center; /* 수평 정렬 (가운데) */
+    height: 100%; /* 화면 높이에 맞추어 정렬 */
+    overflow: auto;
+}
+
 .status-img {
     width: 250px;
     height: 250px;
@@ -133,7 +144,7 @@ p {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: row;
+    flex-direction: column;
     margin-left: 40px;
 }
 
@@ -141,7 +152,7 @@ p {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: row;
+    flex-direction: column;
     margin-left: 40px;
     padding: 40px;
 }
