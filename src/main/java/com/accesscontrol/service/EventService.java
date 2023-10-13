@@ -22,7 +22,7 @@ public class EventService {
     private final RecycleFn recycleFn;
 
     // Event 객체의 Status 값 업데이트
-    public Event updateCustomStatus(String status) {
+    public void updateCustomStatus(String status) {
         Event event = null;
 
         try {
@@ -37,11 +37,10 @@ public class EventService {
         }
 
         log.info("Event 객체 상태 업데이트 완료 - 상태 : {}", event.getCustomStatus());
-        return event;
     }
 
     // maxCount 값 업데이트
-    public Event updateMaxCount(String max) {
+    public void updateMaxCount(String max) {
         Event event = null;
 
         try {
@@ -57,7 +56,6 @@ public class EventService {
         }
 
         log.info("Event 객체 최대 인원 업데이트 완료 - 최대 인원 : {}", event.getMaxCount());
-        return event;
     }
 
     // 재실 인원 값 증가 함수
@@ -157,22 +155,18 @@ public class EventService {
     }
 
     // 데이터 로드용
-    public Event getInitData() {
+    public void getInitData() {
         Event event = null;
 
         try {
             event = recycleFn.getEntity(recycleFn.getEntityCount());
-            recycleFn.validateOperationTime(event);
-            Status status = event.getStatus();
-
             recycleFn.autoUpdateStatus(event);
+            recycleFn.validateOperationTime(event);
             eventRepository.save(event);
             log.info("Event 객체 데이터 로드 완료 - Event ID : {}", event.getId());
             template.convertAndSend("/count/data", event);
         } catch (Exception e) {
             log.error("Event 객체 데이터 로드 실패", e);
         }
-
-        return event;
     }
 }
