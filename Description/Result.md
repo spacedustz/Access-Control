@@ -125,3 +125,11 @@
 RabbitMQ에서 이벤트 메시지가 올때마다 Spring Rest Template을 사용해 GET 요청을 보내서 문을 열어주게 됩니다.
 
 ![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-relay.png)
+
+<br>
+
+> 📌 **끝**
+
+처음부터 끝까지 뭘 만들어 보는게 처음이라 많이 헤맸지만 좋은 경험이 된 것 같습니다.
+
+![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-finish.png)
