@@ -8,7 +8,7 @@
 
 * run() 함수 : Spring 어플리케이션 시작 시, DB에 데이터가 하나도 없으면 초기 데이터 컬럼 생성
 * addData() 함수 : DB에 객체가 1개 이상이고, 데이터의 날짜가 오늘 날짜가 아닐때 오늘 날짜에 해당하는 객체 새로 생성
-* checkTime() 함수 : 매 1시간 정각마다 운영시간인지 확인 후, 운영시간이 아니면 객체의 Status 상태를 변화 후 소켓에 전송
+* healthCheck() 함수 : 10초 마다 운영시간인지 확인 후, 운영시간이 아니면 객체의 Status 상태를 변화 후 소켓에 전송
 
 ```java  
 /**  
@@ -16,7 +16,7 @@
  * @desc  
  * run() 함수 : Spring 어플리케이션 시작 시, DB에 데이터가 하나도 없으면 초기 데이터 컬럼 생성  
  * addData() 함수 : DB에 객체가 1개 이상이고, 데이터의 날짜가 오늘 날짜가 아닐때 오늘 날짜에 해당하는 객체 새로 생성  
- * checkTime() 함수 : 매 1시간 정각마다 운영시간인지 확인 후, 운영시간이 아니면 객체의 Status 상태를 변화 후 소켓에 전송  
+ * healthCheck() 함수 : 10초 마다 운영시간인지 확인 후, 운영시간이 아니면 객체의 Status 상태를 변화 후 소켓에 전송  
  */  
 @Slf4j  
 @Component  
@@ -25,7 +25,7 @@ public class ScheduleTask implements ApplicationRunner {
     private final EventRepository eventRepository;  
     private final RecycleFn recycleFn;  
     private final SimpMessagingTemplate template;  
-      
+  
     @Cacheable("entityCount")  
     public Long getEntityCount() {  
         return eventRepository.count();  
@@ -66,8 +66,8 @@ public class ScheduleTask implements ApplicationRunner {
                 log.info("현재 날짜 : {} - 데이터 날짜 : {}", currentDate, storedEvent.getEventTime());  
                 Event event = Event.createOf(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));  
   
-                try {
-		                event.setRelayUrl("http://localhost:8100/test/post");
+                try {  
+                    event.setRelayUrl("http://192.168.0.7/index.html?p0=1000");  
                     eventRepository.save(event);  
                     log.info("기존 데이터의 날짜와 현재 시간이 불일치합니다, 새로운 객체를 생성 합니다. - Event ID: {}", event.getId());  
                 } catch (Exception e) {  
@@ -91,9 +91,7 @@ public class ScheduleTask implements ApplicationRunner {
             log.info("Event Table 내부에 데이터가 없습니다. 객체를 생성합니다.");  
   
             Event event = Event.createOf(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));  
-            event.setRelayUrl("http://localhost:8100/test/post");
-  
-            log.info("테스트 - 상태값이 뭐가 나올까용 : {}", (event.getStatus().getDesc()));  
+            event.setRelayUrl("http://192.168.0.7/index.html?p0=1000");  
   
             try {  
                 eventRepository.save(event);  
@@ -106,34 +104,18 @@ public class ScheduleTask implements ApplicationRunner {
         addData();  
     }  
   
-    // 1시간마다 운영시간인지 체크해서 현황판의 Status를 변화 시키는 Scheduler    
-    @Scheduled(cron = "0 0 0/1 * * *")  
-    public void checkTime() throws Exception {  
+    // 10초 마다 운영시간인지 체크해서 현황판의 Status를 변화 시키는 Scheduler    
+    @Scheduled(cron = "0/10 * * * * *")  
+    public void healthCheck() {  
         Event event = null;  
   
         try {  
             event = getEntity(getEntityCount());  
-        } catch (Exception e) {  
-            log.error("객체 조회 실패", e);  
-        }  
-  
-        // 운영시간 변환  
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");  
-        assert event != null;  
-        LocalTime open = LocalTime.parse(event.getOpenTime(), timeFormatter);  
-        LocalTime close = LocalTime.parse(event.getCloseTime(), timeFormatter);  
-  
-        // Event 시간 변환  
-        String eventHMDate = recycleFn.hmFormatter(event.getEventTime());  
-        LocalTime eventDateTime = LocalTime.parse(eventHMDate, timeFormatter);  
-  
-        if (!(eventDateTime.isAfter(open) && eventDateTime.isBefore(close))) {  
-            log.error("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", event.getOpenTime(), event.getCloseTime(), eventHMDate);  
-            recycleFn.initiateCount(event);  
-            event.setStatus(Status.NOT_OPERATING);  
-  
+            recycleFn.validateOperationTime(event);  
             eventRepository.save(event);  
             template.convertAndSend("/count/data", event);  
+        } catch (Exception e) {  
+            log.error("객체 조회 실패", e);  
         }  
     }  
 }
