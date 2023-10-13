@@ -124,10 +124,9 @@ public class ScheduleTask implements ApplicationRunner {
             event = getEntity(getEntityCount());
             recycleFn.validateOperationTime(event);
             eventRepository.save(event);
+            template.convertAndSend("/count/data", event);
         } catch (Exception e) {
             log.error("객체 조회 실패", e);
         }
-            template.convertAndSend("/count/data", event);
-
     }
 }
