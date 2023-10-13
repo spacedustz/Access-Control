@@ -29,7 +29,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   
     @Override  
     public void configureMessageBroker(MessageBrokerRegistry registry) {  
-        registry.enableSimpleBroker("/count", "/queue");  
+        registry.enableSimpleBroker("/count");  
         registry.setApplicationDestinationPrefixes("/");  
     }  
   
@@ -42,7 +42,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 }
 ```
 
-<br>
+---
 
 ## 📘 **HttpHandshakeInterceptor**
 

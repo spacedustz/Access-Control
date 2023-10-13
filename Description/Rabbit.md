@@ -6,7 +6,7 @@ Queue 생성, Exchange 생성, Binding 함수는 빼주었습니다.
 
 <br>
 
-`factory()`` : RabbitMQ와의 AMQP 연결을 위한 커넥션을 설정하는 함수입니다.
+`factory()` : RabbitMQ와의 AMQP 연결을 위한 커넥션을 설정하는 함수입니다.
 
 `converter()` : RabbitMQ의 메시지를 내부적으로 변환할 메시지 컨버터를 Bean으로 주입합니다.
 
@@ -44,27 +44,27 @@ public class RabbitConfig {
         factory.setUsername(id);  
         factory.setPassword(pw);  
   
-        return factory.getRabbitConnectionFactory();  
+        return factory;  
     }  
   
     // Rabbit Template 생성  
     @Bean  
-    RabbitTemplate template(org.springframework.amqp.rabbit.connection.ConnectionFactory factory, MessageConverter converter) {  
-        RabbitTemplate template = new RabbitTemplate(factory);  
-        template.setMessageConverter(converter);  
+    RabbitTemplate template() {  
+        RabbitTemplate template = new RabbitTemplate(factory());  
+        template.setMessageConverter(converter());  
   
         return template;  
     }  
   
     // Subscribe Listener  
     @Bean  
-    SimpleRabbitListenerContainerFactory listener(org.springframework.amqp.rabbit.connection.ConnectionFactory connectionFactory) {  
+    SimpleRabbitListenerContainerFactory listener() {  
         final SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();  
-        factory.setConnectionFactory(connectionFactory);  
+        factory.setConnectionFactory(factory());  
         factory.setMessageConverter(converter());  
         factory.setAcknowledgeMode(AcknowledgeMode.AUTO);  
   
         return factory;  
     }  
 }
-```
+```  
