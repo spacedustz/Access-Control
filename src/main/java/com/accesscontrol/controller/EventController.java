@@ -15,20 +15,20 @@ public class EventController {
 
     // Event 객체 Status 값 변경 API
     @PatchMapping("/update-status")
-    public ResponseEntity<EventDTO.Response> updateStatus(@RequestParam String status) {
-        return new ResponseEntity<>(EventDTO.Response.fromEntity(eventService.updateCustomStatus(status)), HttpStatus.OK);
+    public void updateStatus(@RequestParam String status) {
+        eventService.updateCustomStatus(status);
     }
 
     // Event 객체 MaxCount 값 변경 API
     @PatchMapping("/update-max")
-    public ResponseEntity<EventDTO.Response> updateMaxCount(@RequestParam String max) {
-        return new ResponseEntity<>(EventDTO.Response.fromEntityForUpdateMaxCount(eventService.updateMaxCount(max)), HttpStatus.OK);
+    public void updateMaxCount(@RequestParam String max) {
+        eventService.updateMaxCount(max);
     }
 
     // 초기 데이터 로드용 API
     @GetMapping("/init")
-    public ResponseEntity<EventDTO.Response> getInitData() {
-        return new ResponseEntity<>(EventDTO.Response.fromEntity(eventService.getInitData()), HttpStatus.OK);
+    public void getInitData() {
+        eventService.getInitData();
     }
 
     // 현재 재실 인원 변경 API - 증가
