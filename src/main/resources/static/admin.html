@@ -9,14 +9,17 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="admin-body">
 
 <section class="admin-container1">
     <div class="admin-div">
-        <h1 class="admin-color">운영 시간</h1>
+        <h1 class="admin-color">[ 현재 운영 시간 ]</h1>
         <span id="open" class="admin-color"></span> - <span id="close" class="admin-color"></span>
 
-        <h2 class="admin-color">운영 시간 변경</h2>
+        <br>
+
+        <h2 class="admin-color">[ 운영 시간 변경 ]</h2>
+        <p style="color: azure; font-weight: bold; font-size: 16px;">※ 시작 시간과 종료 시간을 항상 같이 입력해 주세요. (숫자만)</p>
         <p style="font-size: 11px;"><strong class="admin-color">시작 시간</strong>
             <input type="text" id="new-start-open" class="time" name="newOpenTime" placeholder="00~23">
             <strong class="admin-color">:</strong>
@@ -35,8 +38,10 @@
     <br>
 
     <div class="admin-div">
-        <h2 class="admin-color">상태 메시지 변경</h2>
+        <h2 class="admin-color">[ 상태 메시지 변경 ]</h2>
         <p class="admin-color">현재 상태 메시지 : <span id="status"></span></p>
+
+        <p style="color: azure; font-weight: bold; font-size: 16px;">※ 임의로 설정한 상태 메시지를 초기화 하려면 입력창이 빈칸인 상태에서 상태 변경을 눌러주세요.</p>
 
         <input type="text" id="new-status" name="newStatus" placeholder="새로운 상태 입력">
         <button type="button" onclick="updateStatus()">상태 변경</button>
@@ -47,7 +52,7 @@
 
 <section class="admin-container2">
     <div class="admin-div">
-        <h2 class="admin-color">재실 인원 변경</h2>
+        <h2 class="admin-color">[ 재실 인원 변경 ]</h2>
         <p class="admin-color">현재 재실 인원 : <span id="count"></span></p>
 
         <input type="text" id="increase-occupancy" name="IncreaseOccupancy" placeholder="증가 시킬 수 입력">
@@ -62,7 +67,7 @@
     <br>
 
     <div class="admin-div">
-        <h2 class="admin-color">최대 인원 변경</h2>
+        <h2 class="admin-color">[ 최대 인원 변경 ]</h2>
         <p class="admin-color">현재 최대 인원 : <span id="max"></span></p>
 
         <input type="text" id="new-max" name="newStatus" placeholder="변경할 최대 인원 수 입력">
@@ -74,7 +79,7 @@
 <br>
 
 <div class="admin-div">
-    <h2 class="admin-color">Relay URL 변경</h2>
+    <h2 class="admin-color">[ Relay URL 변경 ]</h2>
     <p class="admin-color">현재 Relay URL : <span id="url" class="admin-color"></span></p>
 
     <input type="text" id="new-relay" name="newRelay" placeholder="변경할 URL 입력">
