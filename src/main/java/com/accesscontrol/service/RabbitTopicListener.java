@@ -24,7 +24,6 @@ import java.util.Locale;
 @Service
 @RequiredArgsConstructor
 public class RabbitTopicListener {
-    private String currentDate = String.valueOf(LocalDate.now());
     private final EventRepository eventRepository;
     private final SimpMessagingTemplate template;
     private final RecycleFn recycleFn;
@@ -54,12 +53,12 @@ public class RabbitTopicListener {
 //        LocalDateTime convertedDate = LocalDateTime.parse(originalDate, formatter);
 
         // DB에 저장된 데이터의 날짜 나누기
-        String entityYMDDate = recycleFn.ymdFormatter(event.getEventTime()); // YYYY-MM-DD
-        String entityHMDate = recycleFn.hmFormatter(event.getEventTime()); // HH-MM
+        String entityYMDDate = recycleFn.ymdFormatter(event.getEventTime()); // 객체의 YYYY-MM-DD 날짜
+        String entityHMDate = recycleFn.hmFormatter(event.getEventTime()); // 객체의 HH-MM 날짜
 
         // 이벤트로 넘어온 데이터의 날짜 나누기
-        String eventYMDDate = recycleFn.ymdFormatter(convertedDate); // YYYY-MM-DD
-        String eventHMDate = recycleFn.hmFormatter(convertedDate); // HH-MM
+        String eventYMDDate = recycleFn.ymdFormatter(convertedDate); // 이벤트 데이터의 YYYY-MM-DD 날짜
+        String eventHMDate = recycleFn.hmFormatter(convertedDate); // 이벤트 데이터의 HH-MM 날짜
 
         // 이벤트로 넘어온 데이터의 시간이 운영시간 범위에 존재하는지 확인하기 위한 LocalTime 타입 변환
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -68,7 +67,7 @@ public class RabbitTopicListener {
         LocalTime eventDateTime = LocalTime.parse(eventHMDate, timeFormatter);
 
         // 날짜, 운영시간 검증, 현재 Entity와 이벤트로 넘어온 년월일이, 현재 시간과 맞는지 검증
-        validateOperatingStatus(entityYMDDate, eventYMDDate, open, close, eventDateTime, openTime, closeTime, event);
+        recycleFn.validateOperatingStatus(entityYMDDate, eventYMDDate, open, close, eventDateTime, openTime, closeTime, event);
 
         // 이벤트로 넘어온 데이터의 Direction 가져오기
         List<String> directions = message.getEvents().stream().map(it -> it.getExtra().getCrossing_direction()).toList();
@@ -85,7 +84,7 @@ public class RabbitTopicListener {
             }
 
             if (event.getInCount() - event.getOutCount() < 0) {
-                validateOccupancy(event);
+                recycleFn.validateOccupancy(event);
             }
 
             event.setOccupancy(event.getInCount() - event.getOutCount());
@@ -107,56 +106,5 @@ public class RabbitTopicListener {
 
         // 요청 보내기
         restTemplate.getForEntity(url, Void.class);
-    }
-
-    // 재실 인원 검증 함수
-    public void validateOccupancy(Event event) {
-        try {
-            if (event.getOccupancy() < 0) {
-                recycleFn.initiateCount(event);
-                eventRepository.save(event);
-
-                log.error("재실 인원 오류 - In/Out Count, Occupancy 초기화 - 초기화 된 Occupancy 값 : {}", event.getOccupancy());
-            }
-
-            if (event.getOccupancy() >= event.getMaxCount()) {
-                log.info("인원 초과 - 재실 인원/최대인원 : {}명/{}명", event.getOccupancy(), event.getMaxCount());
-            }
-
-            template.convertAndSend("/count/data", event);
-        } catch (Exception e) {
-            log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId(), e);
-        }
-    }
-
-    // 운영시간 검증 함수
-    public void validateOperatingStatus(String entityYMDDate,
-                                        String eventYMDDate,
-                                        LocalTime open,
-                                        LocalTime close,
-                                        LocalTime eventDateTime,
-                                        String openTime,
-                                        String closeTime,
-                                        Event event) {
-
-        // 이벤트 데이터의 날짜 검증
-        if (!eventYMDDate.equals(currentDate) || (!entityYMDDate.equals(currentDate))) {
-            log.error("데이터의 날짜가 오늘 날짜가 아닙니다. - 현재 날짜 : {}, 데이터의 날짜 : {}", currentDate, eventYMDDate);
-        }
-
-        // 이벤트 데이터의 운영 시간 검증
-        if (!eventDateTime.isAfter(open) && !eventDateTime.isBefore(close)) {
-            event.setStatus(Status.NOT_OPERATING);
-            log.error("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", openTime, closeTime, eventDateTime);
-        }
-
-        try {
-            eventRepository.save(event);
-        } catch (Exception e) {
-            log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId());
-        }
-
-        // Web Socket Session 에 Event 객체 전달
-        template.convertAndSend("/count/data", event);
     }
 }
