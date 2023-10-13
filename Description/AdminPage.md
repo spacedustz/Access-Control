@@ -1,99 +1,116 @@
 ## 📘 **어드민용 관리 페이지 - 데이터 동기화**
 
-> **관리자용** : `admin.html, admin.js`
+백엔드에서 열어준 소켓 채널들을 Subscribe 해서 Admin 페이지의 기능 버튼을 누르면,
+
+백엔드 서버의 void 함수들이 로직 실행 결과가 담긴 엔티티를 각 소켓 채널로 밀어줍니다.
+
+그 소켓에서 받은 데이터들을 HTML 요소들과 적절하게 매핑 & 사용합니다.
 
 - Spring 소켓에 접속한 상태
 - Spring Rest API에 요청을 보내 최대 입장 가능 인원, 현재 xx실의 상태를 입력하면 Spring JPA Entity의 값을 변경
-- 그 값을 소켓을 통해 index.js로 넘겨 전광판용 화면에 실시간으로 적용되게 하였습니다.
+- 그 값을 소켓을 통해 index.js로 넘겨 현황판용 화면에 실시간으로 적용되게 하였습니다.
+
+<br>
+
+> 📌 **admin.html**
 
 ```html
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>입장 인원 카운트</title>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<section class="admin-container1">
-    <div class="admin-div">
-        <h1 class="admin-color">운영 시간</h1>
-        <span id="open" class="admin-color"></span> - <span id="close" class="admin-color"></span>
-
-        <h2 class="admin-color">운영 시간 변경</h2>
-        <p style="font-size: 11px;"><strong class="admin-color">시작 시간</strong>
-            <input type="text" id="new-start-open" class="time" name="newOpenTime" placeholder="00~23">
-            <strong class="admin-color">:</strong>
-            <input type="text" id="new-start-close" class="time" name="newCloseTime" placeholder="00~59">
-        </p>
-
-        <p style="font-size: 11px;"><strong class="admin-color">종료 시간</strong>
-            <input type="text" id="new-end-open" class="time" name="newOpenTime" placeholder="00~23">
-            <strong class="admin-color">:</strong>
-            <input type="text" id="new-end-close" class="time" name="newCloseTime" placeholder="00~59">
-        </p>
-
-        <button type="button" onclick="updateOperationTime()">운영시간 변경</button>
-    </div>
-
-    <br>
-
-    <div class="admin-div">
-        <h2 class="admin-color">상태 메시지 변경</h2>
-        <p class="admin-color">현재 상태 메시지 : <span id="status"></span></p>
-
-        <input type="text" id="new-status" name="newStatus" placeholder="새로운 상태 입력">
-        <button type="button" onclick="updateStatus()">상태 변경</button>
-    </div>
-</section>
-
-<br>
-
-<section class="admin-container2">
-    <div class="admin-div">
-        <h2 class="admin-color">재실 인원 변경</h2>
-        <p class="admin-color">현재 재실 인원 : <span id="count"></span></p>
-
-        <input type="text" id="increase-occupancy" name="IncreaseOccupancy" placeholder="증가 시킬 수 입력">
-        <button type="button" onclick="increaseOccupancy()">재실 인원 증가</button>
-
-        <br>
-
-        <input type="text" id="decrease-occupancy" name="DecreaseOccupancy" placeholder="감소 시킬 수 입력">
-        <button type="button" onclick="decreaseOccupancy()">재실 인원 감소</button>
-    </div>
-
-    <br>
-
-    <div class="admin-div">
-        <h2 class="admin-color">최대 인원 변경</h2>
-        <p class="admin-color">현재 최대 인원 : <span id="max"></span></p>
-
-        <input type="text" id="new-max" name="newStatus" placeholder="변경할 최대 인원 수 입력">
-        <button type="button" onclick="updateMaxCount()">최대 인원 변경</button>
-
-    </div>
-</section>
-
-<br>
-
-<div class="admin-div">
-    <h2 class="admin-color">Relay URL 변경</h2>
-    <p class="admin-color">현재 Relay URL : <span id="url" class="admin-color"></span></p>
-
-    <input type="text" id="new-relay" name="newRelay" placeholder="변경할 URL 입력">
-    <button type="button" onclick="updateRelayUrl()">URL 변경</button>
-</div>
-
-<script src="admin.js"></script>
-</body>
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <meta charset="UTF-8">  
+    <title>입장 인원 카운트</title>  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>  
+    <link rel="stylesheet" href="style.css">  
+</head>  
+  
+<body class="admin-body">  
+  
+<section class="admin-container1">  
+    <div class="admin-div">  
+        <h1 class="admin-color">[ 현재 운영 시간 ]</h1>  
+        <span id="open" class="admin-color"></span> - <span id="close" class="admin-color"></span>  
+  
+        <br>  
+  
+        <h2 class="admin-color">[ 운영 시간 변경 ]</h2>  
+        <p style="color: azure; font-weight: bold; font-size: 16px;">※ 시작 시간과 종료 시간을 항상 같이 입력해 주세요. (숫자만)</p>  
+        <p style="font-size: 11px;"><strong class="admin-color">시작 시간</strong>  
+            <input type="text" id="new-start-open" class="time" name="newOpenTime" placeholder="00~23">  
+            <strong class="admin-color">:</strong>  
+            <input type="text" id="new-start-close" class="time" name="newCloseTime" placeholder="00~59">  
+        </p>  
+  
+        <p style="font-size: 11px;"><strong class="admin-color">종료 시간</strong>  
+            <input type="text" id="new-end-open" class="time" name="newOpenTime" placeholder="00~23">  
+            <strong class="admin-color">:</strong>  
+            <input type="text" id="new-end-close" class="time" name="newCloseTime" placeholder="00~59">  
+        </p>  
+  
+        <button type="button" onclick="updateOperationTime()">운영시간 변경</button>  
+    </div>  
+  
+    <br>  
+  
+    <div class="admin-div">  
+        <h2 class="admin-color">[ 상태 메시지 변경 ]</h2>  
+        <p class="admin-color">현재 상태 메시지 : <span id="status"></span></p>  
+  
+        <p style="color: azure; font-weight: bold; font-size: 16px;">※ 임의로 설정한 상태 메시지를 초기화 하려면 입력창이 빈칸인 상태에서 상태 변경을 눌러주세요.</p>  
+  
+        <input type="text" id="new-status" name="newStatus" placeholder="새로운 상태 입력">  
+        <button type="button" onclick="updateStatus()">상태 변경</button>  
+    </div>  
+</section>  
+  
+<br>  
+  
+<section class="admin-container2">  
+    <div class="admin-div">  
+        <h2 class="admin-color">[ 재실 인원 변경 ]</h2>  
+        <p class="admin-color">현재 재실 인원 : <span id="count"></span></p>  
+  
+        <input type="text" id="increase-occupancy" name="IncreaseOccupancy" placeholder="증가 시킬 수 입력">  
+        <button type="button" onclick="increaseOccupancy()">재실 인원 증가</button>  
+  
+        <br>  
+  
+        <input type="text" id="decrease-occupancy" name="DecreaseOccupancy" placeholder="감소 시킬 수 입력">  
+        <button type="button" onclick="decreaseOccupancy()">재실 인원 감소</button>  
+    </div>  
+  
+    <br>  
+  
+    <div class="admin-div">  
+        <h2 class="admin-color">[ 최대 인원 변경 ]</h2>  
+        <p class="admin-color">현재 최대 인원 : <span id="max"></span></p>  
+  
+        <input type="text" id="new-max" name="newStatus" placeholder="변경할 최대 인원 수 입력">  
+        <button type="button" onclick="updateMaxCount()">최대 인원 변경</button>  
+  
+    </div>  
+</section>  
+  
+<br>  
+  
+<div class="admin-div">  
+    <h2 class="admin-color">[ Relay URL 변경 ]</h2>  
+    <p class="admin-color">현재 Relay URL : <span id="url" class="admin-color"></span></p>  
+  
+    <input type="text" id="new-relay" name="newRelay" placeholder="변경할 URL 입력">  
+    <button type="button" onclick="updateRelayUrl()">URL 변경</button>  
+</div>  
+  
+<script src="admin.js"></script>  
+</body>  
 </html>
 ```
+
+<br>
+
+> 📌 **admin.js**
 
 ```js
 const wsUrl = 'ws://localhost:8090/ws';  
@@ -103,10 +120,8 @@ let socket = new WebSocket(wsUrl);
 let stompClient = Stomp.over(socket);  
   
 let roomInfo = {  
-    occupancy: 0, // 현재 Room 내 인원 수 : InCount - OutCount    
-    maxCount: 0, // 최대 수용 인원  
-    status: "", // Room 상태 (Spring Enum : Status)    
-    customStatus: "", // Custom Status  
+    occupancy: 0, // 현재 Room 내 인원 수 : InCount - OutCount    maxCount: 0, // 최대 수용 인원  
+    status: "", // Room 상태 (Spring Enum : Status)    customStatus: "", // Custom Status  
     relayUrl: "", // Relay URL  
     openTime: "", // 운영 시작 시간  
     closeTime: "", // 운영 종료 시간  
@@ -197,11 +212,11 @@ function showStats(data) {
             displayStatus(roomInfo.status);  
             break;  
         case "MEDIUM":  
-            roomInfo.status  = "혼잡합니다.";  
+            roomInfo.status  = "조금 혼잡합니다.";  
             displayStatus(roomInfo.status);  
             break;  
         case "HIGH":  
-            roomInfo.status  = "만실입니다.";  
+            roomInfo.status  = "입장이 불가합니다.";  
             displayStatus(roomInfo.status);  
             break;  
         case "NOT_OPERATING":  
@@ -346,9 +361,9 @@ function fetchText(url, method = 'PATCH', body = {}) {
 
 <br>
 
-**CSS**
+> 📌 **style.css**
 
-스타일은 계속 수정중이지만 지금은 아주 간단하게 해놨습니다.
+1개의 CSS를 2개의 HTML에서 사용하고 있습니다.
 
 ```css
 /* Button */  
@@ -372,7 +387,9 @@ body {
     flex-direction: column;  
     align-items: center; /* 수직 정렬 (가운데) */  
     justify-content: center; /* 수평 정렬 (가운데) */  
-    height: 100vh; /* 화면 높이에 맞추어 정렬 */}  
+    height: 100vh; /* 화면 높이에 맞추어 정렬 */    
+    overflow: hidden;  
+}  
   
 /* Input */  
 input[type="text"],  
@@ -404,6 +421,17 @@ p {
     font-size: 18px  
 }  
   
+.admin-body {  
+    background-color: #001228;  
+    /*background-image: url(back.png);*/  
+    display: flex;  
+    flex-direction: column;  
+    align-items: center; /* 수직 정렬 (가운데) */  
+    justify-content: center; /* 수평 정렬 (가운데) */  
+    height: 100%; /* 화면 높이에 맞추어 정렬 */    
+    overflow: auto;  
+}  
+  
 .status-img {  
     width: 250px;  
     height: 250px;  
@@ -424,12 +452,10 @@ p {
     background-color: white;  
     padding: 7px;  
     color: #001228;  
-    margin-right: 15px;  
-    margin-left: 15px;  
     border-radius: 10px;  
     font-size: 70px;  
-    width: 230px;  
-    height: 150px;  
+    width: 280px;  
+    height: 160px;  
     font-weight: bold;  
 }  
   
@@ -438,12 +464,10 @@ p {
     background-color: white;  
     padding: 7px;  
     color: #001228;  
-    margin-right: 15px;  
-    margin-left: 15px;  
     border-radius: 10px;  
     font-size: 70px;  
-    width: 230px;  
-    height: 150px;  
+    width: 280px;  
+    height: 160px;  
     font-weight: bold;  
 }  
   
@@ -476,16 +500,6 @@ p {
     padding-top: 50px;  
 }  
   
-.flex-container h2 {  
-    margin-right: 35px;  
-}  
-  
-.flex-container p {  
-    margin-right: 60px;  
-    font-size: 64px;  
-    color: white;  
-}  
-  
 .time {  
     width: 38px;  
 }  
@@ -498,7 +512,7 @@ p {
     display: flex;  
     justify-content: center;  
     align-items: center;  
-    flex-direction: row;  
+    flex-direction: column;  
     margin-left: 40px;  
 }  
   
@@ -506,7 +520,7 @@ p {
     display: flex;  
     justify-content: center;  
     align-items: center;  
-    flex-direction: row;  
+    flex-direction: column;  
     margin-left: 40px;  
     padding: 40px;  
 }
