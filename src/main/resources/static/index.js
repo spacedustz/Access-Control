@@ -24,7 +24,7 @@ stompClient.connect({}, (frame) => {
     stompClient.subscribe('/count/customStatus', function (data) {
         let entity = JSON.parse(data.body);
         roomInfo.customStatus = entity.customStatus
-        displayStatus(roomInfo.customStatus);
+        displayCustomStatus(roomInfo.customStatus);
         let coloredStatus = document.getElementById('status');
         let statusImg = document.getElementById('statusImg');
         coloredStatus.style.color = '#ff0000';
@@ -57,13 +57,15 @@ function loadInitialData() {
         });
 }
 
-// 현재 인원 업데이트 함수
+// 현황판의 정보들을 실시간으로 업데이트 해주는 함수
 function updateRoomInfo(data) {
     roomInfo.maxCount = data.maxCount;
     roomInfo.customStatus = data.customStatus;
     roomInfo.openTime = data.openTime;
     roomInfo.closeTime = data.closeTime;
     roomInfo.status = data.status;
+
+    displayMaxCount(roomInfo.maxCount);
 
     if (data.occupancy < 0) {
         let initOccupancy = 0;
@@ -73,25 +75,28 @@ function updateRoomInfo(data) {
         displayOccupancy(roomInfo.occupancy);
     }
 
-    switch (data.status) {
-        case "LOW":
-            roomInfo.status = "입장 가능합니다.";
-            displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
-            break;
-        case "MEDIUM":
-            roomInfo.status  = "조금 혼잡합니다.";
-            displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
-            break;
-        case "HIGH":
-            roomInfo.status  = "입장이 불가합니다.";
-            displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
-            break;
-        case "NOT_OPERATING":
-            roomInfo.status  = "운영시간이 아닙니다.";
-            displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
-            break;
+    if (data.customStatus === "") {
+        switch (data.status) {
+            case "LOW":
+                roomInfo.status = "입장 가능합니다.";
+                displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
+                break;
+            case "MEDIUM":
+                roomInfo.status = "조금 혼잡합니다.";
+                displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
+                break;
+            case "HIGH":
+                roomInfo.status = "입장이 불가합니다.";
+                displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
+                break;
+            case "NOT_OPERATING":
+                roomInfo.status = "운영시간이 아닙니다.";
+                displayStatus(roomInfo.status, roomInfo.occupancy, roomInfo.maxCount);
+                break;
+        }
+    } else {
+        displayCustomStatus(roomInfo.customStatus);
     }
-    displayMaxCount(roomInfo.maxCount);
 }
 
 // 최대 인원
@@ -127,13 +132,23 @@ function displayStatus(status, occupancy, maxCount) {
         document.getElementById('view-max').style.color = '#ff0000';
     }
 
-
     if (document.getElementById('status').innerText === '운영시간이 아닙니다.') {
         coloredStatus.style.color = '#ff0000';
         statusImg.src = './img/Red.png';
         document.getElementById('view-occupancy').style.color = '#ff0000';
         document.getElementById('view-max').style.color = '#ff0000';
     }
+}
+
+// Custom Status 함수
+function displayCustomStatus(status) {
+    document.getElementById('status').innerText = status;
+    let coloredStatus = document.getElementById('status');
+    let statusImg = document.getElementById('statusImg');
+    coloredStatus.style.color = '#ff0000';
+    statusImg.src = './img/Red.png';
+    document.getElementById('view-occupancy').style.color = '#ff0000';
+    document.getElementById('view-max').style.color = '#ff0000';
 }
 
 /* --- Utility 함수 --- */
