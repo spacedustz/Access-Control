@@ -94,3 +94,9 @@ echo 10초 후, 현황판과 관리 페이지가 열립니다.
 **터미널**
 
 ![img](https://raw.githubusercontent.com/spacedustz/Obsidian-Image-Server/main/img2/h-batch2.png)
+
+<br>
+
+> 📌 **윈도우 시작 시 배치 파일 실행**
+
+`C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup` 경로에 Open-Server, Close-Server 파일을 놔두면 됩니다.
