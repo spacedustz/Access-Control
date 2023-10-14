@@ -1,4 +1,4 @@
-## 📘 **WebSocketConfig**
+## 📘 WebSocket / Web Config
 
 `WebSocketMessageBrokerConfigurer` : 인터페이스를 구현해 STOMP로 메시지 처리 구성합니다.
 
@@ -21,6 +21,10 @@
 - `ws`라는 Endpoint에 Interceptor를 추가해 Socket을 등록합니다.
 - 인터셉터는 바로 아래에 설명 하겠습니다.
 
+<br>
+
+> 📌 **WebSocketConfig**
+
 ```java
 @Configuration  
 @RequiredArgsConstructor  
@@ -42,9 +46,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 }
 ```
 
----
+<br>
 
-## 📘 **HttpHandshakeInterceptor**
+> 📌 **HttpHandshakeInterceptor**
 
 WebSocket 연결을 수립하기 전에 `beforeHandshake()` 함수가 실행됩니다.
 - 웹소켓은 처음 Connect 시점에 Handshake라는 작업이 수행됩니다.
@@ -77,5 +81,39 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor {
                                ServerHttpResponse response,  
                                WebSocketHandler wsHandler,  
                                Exception exception) {}  
+}
+```
+
+<br>
+
+> 📌 **WebConfig**
+
+Rest API 요청을 위한 RestTemplate, WebClient와 Thread 관리를 위한 TaskExecutor를 Bean으로 등록합니다.
+
+```java
+@Configuration
+public class WebConfig {
+
+  @Bean(name = "api")
+  public RestTemplate template() {
+    return new RestTemplate();
+  }
+
+  @Bean
+  public WebClient webClient() {
+    return WebClient.builder().build();
+  }
+
+  @Bean
+  public TaskExecutor executor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(1);
+    executor.setMaxPoolSize(1);
+    executor.setQueueCapacity(1);
+    executor.setThreadNamePrefix("Instance Thread-");
+    executor.initialize();
+
+    return executor;
+  }
 }
 ```

@@ -1,6 +1,6 @@
-## 📘 인스턴스 Health Check 스레드
+## 📘 Instance Health Check Thread
 
-무한루프틑 돌며 카메라 인스턴스의 상태를 Spring WebClient를 사용해 카메라 서버에 Rest API 요청을 통해 받습니다.
+카메라 인스턴스의 상태를 Spring WebClient를 사용해 카메라 서버에 Rest API 요청을 통해 받습니다.
 
 그 후, 받아온 인스턴스의 정보를 DTO로 역직렬화 하여, 상태값에 따라 인스턴스가 실행중이 아니라면,
 
@@ -8,45 +8,9 @@
 
 <br>  
 
-> 📌 **WebConfig**
-
-WebClient와 TaskExecutor Bean을 정의 해줍니다.
-
-스레드풀은 어플리케이션의 부하 상태나 요구 사항에 따라 Custom 하게 바꿔주면 됩니다.
-
-```java  
-@Configuration  
-public class WebConfig {  
-  
-    @Bean(name = "api")  
-    public RestTemplate template() {  
-        return new RestTemplate();  
-    }  
-  
-    @Bean  
-    public WebClient webClient() {  
-        return WebClient.builder().build();  
-    }  
-  
-    @Bean  
-    public TaskExecutor executor() {  
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();  
-        executor.setCorePoolSize(1);  
-        executor.setMaxPoolSize(1);  
-        executor.setQueueCapacity(1);  
-        executor.setThreadNamePrefix("Instance Thread-");  
-        executor.initialize();  
-  
-        return executor;  
-    }  
-} 
-```  
-
-<br>  
-
 > 📌 **InstanceMonitoringThread**
 
-무한 루프를 돌며, 카메라 인스턴스의 상태를 Health Check 하는 스레드입니다.
+카메라 인스턴스의 상태를 Health Check 하는 스레드입니다.
 
 - init() : 이 클래스가 초기화 될 때 내부 함수인 **monitoringInstanceConnection**를 Execute 시켜 줍니다.
 - run() : 스레드가 실행되면 인스턴스의 상태값을 Rest API에 요청해 가져오고, 상태값에 따라 인스턴스를 시작 시킵니다.
@@ -123,13 +87,11 @@ public class InstanceMonitoringThread extends Thread {
   
     private void monitoringInstanceConnection() {  
         executor.execute(() -> {  
-            while (true) {  
-                InstanceMonitoringThread instanceThread = new InstanceMonitoringThread(executor, webClient, mapper);  
-                executor.execute(instanceThread);  
-            }  
+            InstanceMonitoringThread instanceThread = new InstanceMonitoringThread(executor, webClient, mapper);  
+            executor.execute(instanceThread);  
         });  
     }  
-} 
+}
 ```  
 
 <br>  
