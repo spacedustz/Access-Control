@@ -11,6 +11,11 @@ test {
     enabled = false
 }
 
+bootJar {
+    archiveFileName = 'count.jar'
+    archiveClassifier = ''
+}
+
 java {
     sourceCompatibility = '17'
 }
