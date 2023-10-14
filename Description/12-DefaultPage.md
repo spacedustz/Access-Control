@@ -1,4 +1,4 @@
-## 📘 **현황판용 페이지 - 데이터 동기화**
+## 📘 **현황판용 페이지 구현**
 
 현황판에 표시될 현재 입장 가능인원, 관리자용 최대인원 & 상태 수정 페이지를 따로 나눴습니다.
 
@@ -10,12 +10,12 @@ URL별 분리를 위해 간단한 컨트롤러를 하나 만들어서,
 
 ```java
 // 어드민 페이지 분리를 위한 컨트롤러  
-@Controller
-public class ViewController {
-    @RequestMapping("/admin")
-    public String adminPage() {
-        return "forward:/admin.html";
-    }
+@Controller  
+public class ViewController {  
+    @RequestMapping("/admin")  
+    public String adminPage() {  
+        return "forward:/admin.html";  
+    }  
 }
 ```
 

@@ -1,15 +1,20 @@
 ## 📘 **구현 내용 정리**
-- [Yaml Setting](https://github.com/spacedustz/Access-Control/blob/main/Description/Yaml.md)
-- [Rabbit Config Setting](https://github.com/spacedustz/Access-Control/blob/main/Description/Rabbit.md)
-- [데이터를 담을 DTO, Entity 설계](https://github.com/spacedustz/Access-Control/blob/main/Description/Entity.md)
-- [초기 데이터 생성, 주기적인 Schedule Task 작업](https://github.com/spacedustz/Access-Control/blob/main/Description/ScheduleTask.md)
-- [MQTT -> Rabbit -> Spring으로 넘어온 데이터 필터링](https://github.com/spacedustz/Access-Control/blob/main/Description/Listener.md)
-- [WebSocket & HttpHandshakeInterceptor](https://github.com/spacedustz/Access-Control/blob/main/Description/WebSocket.md)
-- [브라우저 <-> Spring 간단한 Rest API 작성](https://github.com/spacedustz/Access-Control/blob/main/Description/API.md)
-- [현황판용 페이지 만들기 - 데이터 동기화](https://github.com/spacedustz/Access-Control/blob/main/Description/DefaultPage.md)
-- [어드민용 관리자 페이지 만들기 - 데이터 동기화](https://github.com/spacedustz/Access-Control/blob/main/Description/AdminPage.md)
-- [인스턴스의 Health Check를 수행하는 무한 루프 스레드](https://github.com/spacedustz/Access-Control/blob/main/Description/Thread.md)
-- [기능 테스트 & 결과물](https://github.com/spacedustz/Access-Control/blob/main/Description/Result.md)
+- [1. Yaml Setting](https://github.com/spacedustz/Access-Control/blob/main/Description/1-Yaml.md)
+- [2. Rabbit Config Setting](https://github.com/spacedustz/Access-Control/blob/main/Description/2-Rabbit.md)
+- [3. WebSocket & Web Config](https://github.com/spacedustz/Access-Control/blob/main/Description/3-WebSocket.md)
+- [4. 데이터를 담을 DTO](https://github.com/spacedustz/Access-Control/blob/main/Description/4-DTO.md)
+- [5. Entity 작성](https://github.com/spacedustz/Access-Control/blob/main/Description/5-Entity.md)
+- [6. 초기 데이터 생성, 주기적인 Schedule Task 작업](https://github.com/spacedustz/Access-Control/blob/main/Description/6-ScheduleTask.md)
+- [7. MQTT -> Rabbit -> Spring으로 넘어온 데이터 필터링](https://github.com/spacedustz/Access-Control/blob/main/Description/7-Listener.md)
+- [8. Event Service 작성](https://github.com/spacedustz/Access-Control/blob/main/Description/8-Service.md)
+- [9. Event Controller 작성](https://github.com/spacedustz/Access-Control/blob/main/Description/9-Controller.md)
+- [10. RecycleFn 작성 (공통 로직)](https://github.com/spacedustz/Access-Control/blob/main/Description/10-Recycle.md)
+- [11. Instance Health Check Thread](https://github.com/spacedustz/Access-Control/blob/main/Description/11-Thread.md)
+- [12. 현황판용 페이지 만들기 - 데이터 동기화](https://github.com/spacedustz/Access-Control/blob/main/Description/12-DefaultPage.md)
+- [13. 어드민용 관리자 페이지 만들기 - 데이터 동기화](https://github.com/spacedustz/Access-Control/blob/main/Description/13-AdminPage.md)
+- [14. Style.css 작성](https://github.com/spacedustz/Access-Control/blob/main/Description/14-Style.md)
+- [15. Window Batch 파일 작성 - Server Health Check](https://github.com/spacedustz/Access-Control/blob/main/Description/15-Batch.md)
+- [기능 테스트 & 결과물](https://github.com/spacedustz/Access-Control/blob/main/Description/16-Result.md)
 
 ---
 
@@ -30,6 +35,8 @@
 7. DB로 저장된 값을 웹소켓 채널을 여러개 열어 목적에 맞는 채널에 데이터를 흘려줍니다.
 
 8. 프론트단에서 Spring의 웹 소켓에 접속해 알맞는 채널에서 데이터들을 받아 변환 후 화면에 출력합니다.
+
+9. Window Batch 파일을 작성해, 서버들 & 인스턴스의 Health Check를 해서 자동으로 재 시작 해줍니다.
 
 <br>
 
