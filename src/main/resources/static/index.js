@@ -47,6 +47,7 @@ stompClient.connect({}, (frame) => {
 
 // 렌더링 시 Entity 값 화면에 출력
 window.onload = function () {
+    loadInitialData(roomInfo);
     loadInitialData();
 };
 
