@@ -80,10 +80,8 @@ public class InstanceMonitoringThread extends Thread {
 
     private void monitoringInstanceConnection() {
         executor.execute(() -> {
-            while (true) {
-                InstanceMonitoringThread instanceThread = new InstanceMonitoringThread(executor, webClient, mapper);
-                executor.execute(instanceThread);
-            }
+            InstanceMonitoringThread instanceThread = new InstanceMonitoringThread(executor, webClient, mapper);
+            executor.execute(instanceThread);
         });
     }
 }
