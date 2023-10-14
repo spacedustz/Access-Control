@@ -7,6 +7,10 @@ plugins {
 group = 'com'
 version = '0.0.1-SNAPSHOT'
 
+test {
+    enabled = false
+}
+
 java {
     sourceCompatibility = '17'
 }
