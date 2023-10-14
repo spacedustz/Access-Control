@@ -2,18 +2,14 @@ package com.accesscontrol.service;
 
 import com.accesscontrol.dto.EventDTO;
 import com.accesscontrol.entity.Event;
-import com.accesscontrol.entity.Status;
-import com.accesscontrol.error.CommonException;
 import com.accesscontrol.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.http.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -76,7 +72,7 @@ public class RabbitTopicListener {
             if (direction.equalsIgnoreCase("down")) {
                 event.setInCount(event.getInCount() + 1);
                 log.info("입장");
-                requestApi(event); // Request Door API
+//                requestApi(event); // Request Door API
             } else if (direction.equalsIgnoreCase("up")) {
                 event.setOutCount(event.getOutCount() + 1);
                 log.info("퇴장");
@@ -99,11 +95,11 @@ public class RabbitTopicListener {
     }
 
     // Door API에 HTTP Request 요청
-    public void requestApi(Event event) {
-        // URL 설정
-        String url = event.getRelayUrl();
-
-        // 요청 보내기
-        restTemplate.getForEntity(url, Void.class);
-    }
+//    public void requestApi(Event event) {
+//        // URL 설정
+//        String url = event.getRelayUrl();
+//
+//        // 요청 보내기
+//        restTemplate.getForEntity(url, Void.class);
+//    }
 }
