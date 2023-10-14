@@ -39,7 +39,6 @@ public class RabbitTopicListener {
             event = recycleFn.getEntity(recycleFn.getEntityCount());
         } catch (Exception e) {
             log.error("DATA-001 : 엔티티 조회 실패");
-            throw new CommonException("DATA-001 : 엔티티 조회 실패", HttpStatus.NOT_FOUND);
         }
 
         String openTime = event.getOpenTime();
