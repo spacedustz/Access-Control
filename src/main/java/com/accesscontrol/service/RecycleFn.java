@@ -27,12 +27,12 @@ public class RecycleFn {
     private final SimpMessagingTemplate template;
     private String currentDate = String.valueOf(LocalDate.now());
 
-    @Cacheable("entityCount")
+    @Transactional(readOnly = true)
     public Long getEntityCount() {
         return eventRepository.count();
     }
 
-    @Cacheable("entity")
+    @Transactional(readOnly = true)
     public Event getEntity(Long pk) {
         return eventRepository.findById(pk).orElseThrow(() -> new CommonException("Data-001", HttpStatus.NOT_FOUND));
     }
@@ -93,7 +93,7 @@ public class RecycleFn {
         } else {
             event.setStatus(Status.NOT_OPERATING);
             initiateCount(event);
-            log.error("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 현재 시간 : {}", openTime, closeTime, now);
+            log.info("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 현재 시간 : {}", openTime, closeTime, now);
         }
 
         return event;
@@ -116,6 +116,7 @@ public class RecycleFn {
             template.convertAndSend("/count/data", event);
         } catch (Exception e) {
             log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId(), e);
+            throw new CommonException("Validate-Occupancy", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -131,19 +132,20 @@ public class RecycleFn {
 
         // 이벤트 데이터의 날짜 검증
         if (!eventYMDDate.equals(currentDate) || (!entityYMDDate.equals(currentDate))) {
-            log.error("데이터의 날짜가 오늘 날짜가 아닙니다. - 현재 날짜 : {}, 데이터의 날짜 : {}", currentDate, eventYMDDate);
+            log.warn("데이터의 날짜가 오늘 날짜가 아닙니다. - 현재 날짜 : {}, 데이터의 날짜 : {}", currentDate, eventYMDDate);
         }
 
         // 이벤트 데이터의 운영 시간 검증
         if (!eventDateTime.isAfter(open) && !eventDateTime.isBefore(close)) {
             event.setStatus(Status.NOT_OPERATING);
-            log.error("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", openTime, closeTime, eventDateTime);
+            log.info("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", openTime, closeTime, eventDateTime);
         }
 
         try {
             eventRepository.save(event);
         } catch (Exception e) {
             log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId());
+            throw new CommonException("Validate-Operation-Time", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         // Web Socket Session에 Event 객체 전달
