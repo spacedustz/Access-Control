@@ -33,16 +33,6 @@ public class ScheduleTask implements ApplicationRunner {
     private final RecycleFn recycleFn;
     private final SimpMessagingTemplate template;
 
-    @Cacheable("entityCount")
-    public Long getEntityCount() {
-        return eventRepository.count();
-    }
-
-    @Cacheable("entity")
-    public Event getEntity(Long pk) {
-        return eventRepository.findById(pk).orElseThrow(() -> new CommonException("Data-001", HttpStatus.NOT_FOUND));
-    }
-
     @Scheduled(cron = "1 0 0 * * *", zone = "Asia/Seoul")
     public void scheduleTask() throws Exception {
         addData();
@@ -52,7 +42,7 @@ public class ScheduleTask implements ApplicationRunner {
     public void addData() throws Exception {
 
         // 테이블에 데이터 수 확인
-        long objectCount = getEntityCount();
+        long objectCount = recycleFn.getEntityCount();
 
         // DB에 데이터가 1개 이상이고, 그 데이터의 현재 년월일이 현재 년월일과 맞지 않으면 새로운 객체 생성
         if (objectCount > 0) {
@@ -60,7 +50,7 @@ public class ScheduleTask implements ApplicationRunner {
 
             Event storedEvent = null;
             try {
-                storedEvent = eventRepository.findById(getEntityCount()).orElse(null);
+                storedEvent = eventRepository.findById(recycleFn.getEntityCount()).orElse(null);
             } catch (Exception e) {
                 log.error("기존에 존재하는 데이터 조회 실패 - Event ID : {}", storedEvent.getId(), e);
                 throw new CommonException("INIT-002", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -91,7 +81,7 @@ public class ScheduleTask implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // 테이블에 데이터 수 확인
-        long objectCount = getEntityCount();
+        long objectCount = recycleFn.getEntityCount();
 
         // DB에 데이터가 하나도 없으면 초기 데이터 생성
         if (objectCount == 0) {
@@ -117,7 +107,7 @@ public class ScheduleTask implements ApplicationRunner {
         Event event = null;
 
         try {
-            event = getEntity(getEntityCount());
+            event = recycleFn.getEntity(recycleFn.getEntityCount());
             recycleFn.validateOperationTime(event);
             eventRepository.save(event);
             template.convertAndSend("/count/data", event);
