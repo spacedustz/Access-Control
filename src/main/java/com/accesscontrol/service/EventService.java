@@ -74,6 +74,7 @@ public class EventService {
             log.info("재실 인원 값 [증가] 성공 - 증가한 수치 : {}, 반영된 현재 방안 인원 수치 : {}", num, event.getOccupancy());
         } catch (Exception e) {
             log.error("재실 인원 수 조정 실패 [증가]", e);
+            throw new CommonException("Occupancy-Increase", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -94,6 +95,7 @@ public class EventService {
             log.info("재실 인원 값 [감소] 성공 - 감소한 수치 : {}, 반영된 현재 방안 인원 수치 : {}", num, event.getOccupancy());
         } catch (Exception e) {
             log.error("재실 인원 수 조정 실패 [감소]", e);
+            throw new CommonException("Occupancy-Decrease", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -109,6 +111,7 @@ public class EventService {
             log.info("운영 시작 시간 변경 완료");
         } catch (Exception e) {
             log.error("Event 영업시간 로드 실패", e);
+            throw new CommonException("Set-Open-Time", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -124,6 +127,7 @@ public class EventService {
             log.info("운영 종료 시간 변경 완료");
         } catch (Exception e) {
             log.error("Event 영업시간 로드 실패", e);
+            throw new CommonException("Set-Close-Time", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -137,6 +141,7 @@ public class EventService {
             template.convertAndSend("/count/time", event);
         } catch (Exception e) {
             log.error("Event 영업시간 로드 실패", e);
+            throw new CommonException("Get-Open-Time", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -151,10 +156,12 @@ public class EventService {
             template.convertAndSend("/count/relay", event);
         } catch (Exception e) {
             log.error("Event Relay URL 변경 실패 - Event ID : {}", event.getId());
+            throw new CommonException("Set-Relay-Url", HttpStatus.BAD_REQUEST);
         }
     }
 
     // 데이터 로드용
+    @Transactional(readOnly = true)
     public void getInitData() {
         Event event = null;
 
@@ -167,6 +174,7 @@ public class EventService {
             template.convertAndSend("/count/data", event);
         } catch (Exception e) {
             log.error("Event 객체 데이터 로드 실패", e);
+            throw new CommonException("Get-Init-Data", HttpStatus.BAD_REQUEST);
         }
     }
 }
