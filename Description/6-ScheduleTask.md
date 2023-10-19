@@ -11,13 +11,6 @@
 * healthCheck() 함수 : 10초 마다 운영시간인지 확인 후, 운영시간이 아니면 객체의 Status 상태를 변화 후 소켓에 전송
 
 ```java  
-/**  
- * @author: 신건우  
- * @desc  
- * run() 함수 : Spring 어플리케이션 시작 시, DB에 데이터가 하나도 없으면 초기 데이터 컬럼 생성  
- * addData() 함수 : DB에 객체가 1개 이상이고, 데이터의 날짜가 오늘 날짜가 아닐때 오늘 날짜에 해당하는 객체 새로 생성  
- * healthCheck() 함수 : 10초 마다 운영시간인지 확인 후, 운영시간이 아니면 객체의 Status 상태를 변화 후 소켓에 전송  
- */  
 @Slf4j  
 @Component  
 @RequiredArgsConstructor  
@@ -25,16 +18,6 @@ public class ScheduleTask implements ApplicationRunner {
     private final EventRepository eventRepository;  
     private final RecycleFn recycleFn;  
     private final SimpMessagingTemplate template;  
-  
-    @Cacheable("entityCount")  
-    public Long getEntityCount() {  
-        return eventRepository.count();  
-    }  
-  
-    @Cacheable("entity")  
-    public Event getEntity(Long pk) {  
-        return eventRepository.findById(pk).orElseThrow(() -> new CommonException("Data-001", HttpStatus.NOT_FOUND));  
-    }  
   
     @Scheduled(cron = "1 0 0 * * *", zone = "Asia/Seoul")  
     public void scheduleTask() throws Exception {  
@@ -45,7 +28,7 @@ public class ScheduleTask implements ApplicationRunner {
     public void addData() throws Exception {  
   
         // 테이블에 데이터 수 확인  
-        long objectCount = getEntityCount();  
+        long objectCount = recycleFn.getEntityCount();  
   
         // DB에 데이터가 1개 이상이고, 그 데이터의 현재 년월일이 현재 년월일과 맞지 않으면 새로운 객체 생성  
         if (objectCount > 0) {  
@@ -53,7 +36,7 @@ public class ScheduleTask implements ApplicationRunner {
   
             Event storedEvent = null;  
             try {  
-                storedEvent = eventRepository.findById(getEntityCount()).orElse(null);  
+                storedEvent = eventRepository.findById(recycleFn.getEntityCount()).orElse(null);  
             } catch (Exception e) {  
                 log.error("기존에 존재하는 데이터 조회 실패 - Event ID : {}", storedEvent.getId(), e);  
                 throw new CommonException("INIT-002", HttpStatus.INTERNAL_SERVER_ERROR);  
@@ -84,7 +67,7 @@ public class ScheduleTask implements ApplicationRunner {
     @Override  
     public void run(ApplicationArguments args) throws Exception {  
         // 테이블에 데이터 수 확인  
-        long objectCount = getEntityCount();  
+        long objectCount = recycleFn.getEntityCount();  
   
         // DB에 데이터가 하나도 없으면 초기 데이터 생성  
         if (objectCount == 0) {  
@@ -110,7 +93,7 @@ public class ScheduleTask implements ApplicationRunner {
         Event event = null;  
   
         try {  
-            event = getEntity(getEntityCount());  
+            event = recycleFn.getEntity(recycleFn.getEntityCount());  
             recycleFn.validateOperationTime(event);  
             eventRepository.save(event);  
             template.convertAndSend("/count/data", event);  
