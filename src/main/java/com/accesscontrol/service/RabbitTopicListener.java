@@ -3,15 +3,12 @@ package com.accesscontrol.service;
 import com.accesscontrol.dto.EventDTO;
 import com.accesscontrol.entity.Event;
 import com.accesscontrol.repository.EventRepository;
-import com.accesscontrol.thread.InstanceMonitoringThread;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
