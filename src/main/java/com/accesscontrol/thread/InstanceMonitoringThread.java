@@ -33,12 +33,13 @@ public class InstanceMonitoringThread extends Thread {
                 String uri = "http://localhost:8080/api/instance/get?instance_name=" + instanceName;
                 String instanceStatement = getRequest(uri).block();
                 InstanceDto[] instances = mapper.readValue(instanceStatement, InstanceDto[].class);
-                log.info("Instance 결과값 : {}", instanceStatement);
 
                 if (instances != null && instances.length > 0) {
                     Arrays.stream(instances).forEach(instance -> {
 
-                        log.info("Instance 상태 : {}", instances.toString());
+                        if (instance.getState() == 4) {
+                            log.info("Instance 상태 : 실행 중");
+                        }
 
                         if (instance.getState() == 0 || instance.getState() == 1 || instance.getState() == 3 || instance.getState() == 5) {
                             String startUri = "http://localhost:8080/api/instance/start";
@@ -49,9 +50,9 @@ public class InstanceMonitoringThread extends Thread {
 
                             try {
                                 String requestBodyStr = mapper.writeValueAsString(requestBody);
-                                String response = postRequest(startUri, requestBodyStr).block();
+                                postRequest(startUri, requestBodyStr).block();
 
-                                log.info("Instance 시작 : {}, {}", requestBodyStr, response);
+                                log.info("Instance 시작 - 인스턴스 이름 : {}", requestBody.getInstanceName());
                             } catch (Exception e) {
                                 log.error("Instance 시작 실패 with Exception : {}", e.getMessage());
                             }
