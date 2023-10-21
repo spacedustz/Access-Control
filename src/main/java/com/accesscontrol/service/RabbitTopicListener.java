@@ -86,7 +86,7 @@ public class RabbitTopicListener {
             if (direction.equalsIgnoreCase("down")) {
                 event.setInCount(event.getInCount() + 1);
                 log.info("입장");
-//                requestApi(event); // Request Door API
+                requestApi(event); // Request Door API
                 recycleFn.validateOccupancy(event);
                 event.setOccupancy(event.getInCount() - event.getOutCount());
                 recycleFn.autoUpdateStatus(event);
@@ -106,13 +106,13 @@ public class RabbitTopicListener {
     }
 
     // Door API에 HTTP Request 요청
-//    public void requestApi(Event event) {
-//        // URL 설정
-//        String url = event.getRelayUrl();
-//
-//        // 요청 보내기
-//        restTemplate.getForEntity(url, Void.class);
-//    }
+    public void requestApi(Event event) {
+        // URL 설정
+        String url = event.getRelayUrl();
+
+        // 요청 보내기
+        restTemplate.getForEntity(url, Void.class);
+    }
 
     public void addData() throws Exception {
 
