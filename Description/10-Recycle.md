@@ -94,16 +94,23 @@ public class RecycleFn {
 
     // 재실 인원 검증 함수  
     public void validateOccupancy(Event event) {
+        int occupancy = event.getInCount() - event.getOutCount();
+        int max = event.getMaxCount();
+
         try {
-            if (event.getOccupancy() < 0) {
+            if (occupancy < 0) {
                 initiateCount(event);
                 eventRepository.save(event);
 
-                log.error("재실 인원 오류 - In/Out Count, Occupancy 초기화 - 초기화 된 Occupancy 값 : {}", event.getOccupancy());
+                log.warn("재실 인원 오류 - In/Out Count, Occupancy 초기화 - 초기화 된 Occupancy 값 : {}", event.getOccupancy());
             }
 
-            if (event.getOccupancy() >= event.getMaxCount()) {
-                log.info("인원 초과 - 재실 인원/최대인원 : {}명/{}명", event.getOccupancy(), event.getMaxCount());
+            if (occupancy > max) {
+                event.setInCount(15);
+                event.setOutCount(0);
+                event.setOccupancy(event.getMaxCount());
+                eventRepository.save(event);
+                log.warn("인원 초과 - 재실 인원을 최대 인원 수로 변경 : {}", event.getOccupancy());
             }
 
             template.convertAndSend("/count/data", event);
