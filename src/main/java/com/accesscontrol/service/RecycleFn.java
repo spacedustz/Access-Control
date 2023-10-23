@@ -7,7 +7,6 @@ import com.accesscontrol.repository.EventRepository;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -113,11 +112,12 @@ public class RecycleFn {
             }
 
             if (occupancy > max) {
-                event.setInCount(15);
-                event.setOutCount(0);
-                event.setOccupancy(event.getMaxCount());
-                eventRepository.save(event);
-                log.warn("인원 초과 - 재실 인원을 최대 인원 수로 변경 : {}", event.getOccupancy());
+//                event.setInCount(event.getMaxCount());
+//                event.setOutCount(0);
+//                event.setOccupancy(event.getMaxCount());
+//                eventRepository.save(event);
+//                log.warn("인원 초과 - 재실 인원을 최대 인원 수로 변경 : {}", event.getOccupancy());
+                log.warn("인원 초과 - 현재 인원 : [{}], 최대 인원 : [{}]", event.getOccupancy(), event.getMaxCount());
             }
 
             template.convertAndSend("/count/data", event);
