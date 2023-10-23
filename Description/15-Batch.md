@@ -43,7 +43,7 @@ if errorlevel 1 (
 )
 
 REM 60초 대기
-timeout /t 60 /nobreak >nul
+timeout /t 5 /nobreak >nul
 echo 대기중 ...
 
 REM 루프 재시작

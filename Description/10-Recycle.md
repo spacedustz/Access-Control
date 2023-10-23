@@ -106,50 +106,50 @@ public class RecycleFn {
             }
 
             if (occupancy > max) {
-                event.setInCount(15);
-                event.setOutCount(0);
-                event.setOccupancy(event.getMaxCount());
-                eventRepository.save(event);
-                log.warn("인원 초과 - 재실 인원을 최대 인원 수로 변경 : {}", event.getOccupancy());
+                log.warn("인원 초과 - 현재 인원 : [{}], 최대 인원 : [{}]", event.getOccupancy(), event.getMaxCount());
+//                event.setInCount(event.getMaxCount());  
+//                event.setOutCount(0);  
+//                event.setOccupancy(event.getMaxCount());  
+//                eventRepository.save(event);  
+//                log.warn("인원 초과 - 재실 인원을 최대 인원 수로 변경 : {}", event.getOccupancy());            }  
+
+                template.convertAndSend("/count/data", event);
+            } catch (Exception e) {
+                log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId(), e);
+                throw new CommonException("Validate-Occupancy", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        // 운영시간 검증 함수  
+        public void validateOperatingStatus(String entityYMDDate,
+                String eventYMDDate,
+                LocalTime open,
+                LocalTime close,
+                LocalTime eventDateTime,
+                String openTime,
+                String closeTime,
+                Event event) {
+
+            // 이벤트 데이터의 날짜 검증  
+            if (!eventYMDDate.equals(currentDate) || (!entityYMDDate.equals(currentDate))) {
+                log.warn("데이터의 날짜가 오늘 날짜가 아닙니다. - 현재 날짜 : {}, 데이터의 날짜 : {}", currentDate, eventYMDDate);
             }
 
+            // 이벤트 데이터의 운영 시간 검증  
+            if (!eventDateTime.isAfter(open) && !eventDateTime.isBefore(close)) {
+                event.setStatus(Status.NOT_OPERATING);
+                log.info("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", openTime, closeTime, eventDateTime);
+            }
+
+            try {
+                eventRepository.save(event);
+            } catch (Exception e) {
+                log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId());
+                throw new CommonException("Validate-Operation-Time", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            // Web Socket Session에 Event 객체 전달  
             template.convertAndSend("/count/data", event);
-        } catch (Exception e) {
-            log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId(), e);
-            throw new CommonException("Validate-Occupancy", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    // 운영시간 검증 함수  
-    public void validateOperatingStatus(String entityYMDDate,
-                                        String eventYMDDate,
-                                        LocalTime open,
-                                        LocalTime close,
-                                        LocalTime eventDateTime,
-                                        String openTime,
-                                        String closeTime,
-                                        Event event) {
-
-        // 이벤트 데이터의 날짜 검증  
-        if (!eventYMDDate.equals(currentDate) || (!entityYMDDate.equals(currentDate))) {
-            log.warn("데이터의 날짜가 오늘 날짜가 아닙니다. - 현재 날짜 : {}, 데이터의 날짜 : {}", currentDate, eventYMDDate);
-        }
-
-        // 이벤트 데이터의 운영 시간 검증  
-        if (!eventDateTime.isAfter(open) && !eventDateTime.isBefore(close)) {
-            event.setStatus(Status.NOT_OPERATING);
-            log.info("운영 시간이 아닙니다. - 운영 시간 : {} - {}, 입장한 시간 : {}", openTime, closeTime, eventDateTime);
-        }
-
-        try {
-            eventRepository.save(event);
-        } catch (Exception e) {
-            log.error("Occupancy, In/Out Count 값 초기화 후 객체 저장 실패 - Event ID : {}", event.getId());
-            throw new CommonException("Validate-Operation-Time", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        // Web Socket Session에 Event 객체 전달  
-        template.convertAndSend("/count/data", event);
-    }
-}
 ```
