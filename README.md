@@ -18,6 +18,21 @@
 
 ---
 
+## 📘 기술 스택
+- Spring Data JPA
+- Spring AMQP
+- Spring Rest Template
+- Spring WebFlux (WebClient)
+- ~~MariaDB~~  -> 삭제, 오버스펙
+- H2 (Imbedded Mode)
+- Web Socket
+- MQTT
+- RabbitMQ
+- ~~Viewer (React + TypeScript)~~ -> 삭제, 오버스펙
+- Viewer (Vanilla JS + Stomp.js)
+
+---
+
 ## 📘 **예상 구현 흐름**
 
 1. 특정 공간에 실시간 카메라가 존재하며, 사람 출입 시 카메라 내부 AI 엔진에서 TripWire Crossing MQTT 이벤트 데이터가 발생합니다.
@@ -97,7 +112,7 @@ Spring Batch를 쓰려 했으나 너무 오버스펙인 것 같아 Spring 내부
 <br>
 
 **healthCheck() 함수**
-- 10초 마다 운영시간인지 확인 후, 운영시간이 아니면 객체의 Status 상태를 변화 후 소켓에 전송
+- 5초 마다 운영시간인지 확인 후, 운영시간이 아니면 객체의 Status 상태를 변화 후 소켓에 전송
 
 > 📌 **View**
 
@@ -128,20 +143,10 @@ Spring Batch를 쓰려 했으나 너무 오버스펙인 것 같아 Spring 내부
 - **(완료)** 운영시간 변경 기능
 - **(완료)** 상태 메시지 변경 기능 - Status가 아닌 CustomStatus를 통해 출력
 - **(완료)** 최대 인원 변경 기능 - 현재 방안의 인원, 최대 인원 수 표시
-- **(완료)**Door API인 Relay URL 표시
+- **(완료)** Door API인 Relay URL 표시
 - **(완료)** 운영시간이 아닐 때 현재 방안의 인원 수 0으로 초기화 - ScheduleTask로 인해 1시간마다 주기적 실행
 - **(완료)** 현재 재실 인원이 마이너스 값이 나오거나 비정상 수치가 나올때 In/Out Count 초기화 로직 작성
 - **(완료)** 현재 재실 인원 변경 기능 추가 - 현재 인원 변경에 따른 In/Out Count 계산 로직 수정
----
-
-## 📘 기술 스택
-- Spring Web (방 내부의 인원수, 최대 수용 인원, 현재 방 상태 등 UI 출력)
-- Spring Data JPA
-- Lombok
-- WebSocket (STOMP)
-- RabbitMQ (AMQP)
-- H2 (Embedded Mode 사용)
-- RestTemplate or WebClient(Reactive)
 
 ---
 
