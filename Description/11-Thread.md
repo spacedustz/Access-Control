@@ -10,7 +10,7 @@
 
 > 📌 **InstanceMonitoringThread**
 
-카메라 인스턴스의 상태를 Health Check 하는 스레드입니다.
+카메라 인스턴스의 상태를 5초마다 Health Check 하는 스레드입니다.
 
 - init() : 이 클래스가 초기화 될 때 내부 함수인 **monitoringInstanceConnection**를 Execute 시켜 줍니다.
 - run() : 스레드가 실행되면 인스턴스의 상태값을 Rest API에 요청해 가져오고, 상태값에 따라 인스턴스를 시작 시킵니다.
@@ -71,7 +71,7 @@ public class InstanceMonitoringThread extends Thread {
             }  
   
             try {  
-                Thread.sleep(10000);  
+                Thread.sleep(5000);  
             } catch (InterruptedException e) {  
                 e.printStackTrace();  
             }  
