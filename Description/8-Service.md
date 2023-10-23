@@ -37,7 +37,7 @@ public class EventService {
             throw new CommonException("EVENT-001", HttpStatus.BAD_REQUEST);
         }
 
-        log.info("Event 객체 상태 업데이트 완료 - 상태 : {}", event.getCustomStatus());
+        log.warn("Event 객체 상태 업데이트 완료 - 상태 : {}", event.getCustomStatus());
     }
 
     // maxCount 값 업데이트  
@@ -56,7 +56,7 @@ public class EventService {
             throw new CommonException("EVENT-001", HttpStatus.BAD_REQUEST);
         }
 
-        log.info("Event 객체 최대 인원 업데이트 완료 - 최대 인원 : {}", event.getMaxCount());
+        log.warn("Event 객체 최대 인원 업데이트 완료 - 최대 인원 : {}", event.getMaxCount());
     }
 
     // 재실 인원 값 증가 함수  
@@ -72,11 +72,12 @@ public class EventService {
             recycleFn.autoUpdateStatus(event);
             eventRepository.save(event);
             template.convertAndSend("/count/occupancy", event);
-            log.info("재실 인원 값 [증가] 성공 - 증가한 수치 : {}, 반영된 현재 방안 인원 수치 : {}", num, event.getOccupancy());
         } catch (Exception e) {
             log.error("재실 인원 수 조정 실패 [증가]", e);
             throw new CommonException("Occupancy-Increase", HttpStatus.BAD_REQUEST);
         }
+
+        log.warn("재실 인원 값 [증가] 성공 - 증가한 수치 : {}, 반영된 현재 방안 인원 수치 : {}", num, event.getOccupancy());
     }
 
     // 재실 인원 값 감소 함수  
@@ -93,11 +94,12 @@ public class EventService {
             recycleFn.autoUpdateStatus(event);
             eventRepository.save(event);
             template.convertAndSend("/count/occupancy", event);
-            log.info("재실 인원 값 [감소] 성공 - 감소한 수치 : {}, 반영된 현재 방안 인원 수치 : {}", num, event.getOccupancy());
         } catch (Exception e) {
             log.error("재실 인원 수 조정 실패 [감소]", e);
             throw new CommonException("Occupancy-Decrease", HttpStatus.BAD_REQUEST);
         }
+
+        log.warn("재실 인원 값 [감소] 성공 - 감소한 수치 : {}, 반영된 현재 방안 인원 수치 : {}", num, event.getOccupancy());
     }
 
     // 운영 시작 시간 변경  
@@ -109,11 +111,12 @@ public class EventService {
             event.setOpenTime(time);
             eventRepository.save(event);
             template.convertAndSend("/count/time", event);
-            log.info("운영 시작 시간 변경 완료");
         } catch (Exception e) {
             log.error("Event 영업시간 로드 실패", e);
             throw new CommonException("Set-Open-Time", HttpStatus.BAD_REQUEST);
         }
+
+        log.warn("운영시작 시간 변경 완료");
     }
 
     // 운영 종료 시간 변경  
@@ -125,11 +128,12 @@ public class EventService {
             event.setCloseTime(time);
             eventRepository.save(event);
             template.convertAndSend("/count/time", event);
-            log.info("운영 종료 시간 변경 완료");
         } catch (Exception e) {
             log.error("Event 영업시간 로드 실패", e);
             throw new CommonException("Set-Close-Time", HttpStatus.BAD_REQUEST);
         }
+
+        log.warn("운영종료 시간 변경 완료");
     }
 
     // 운영 시간 조회  
@@ -144,6 +148,8 @@ public class EventService {
             log.error("Event 영업시간 로드 실패", e);
             throw new CommonException("Get-Open-Time", HttpStatus.BAD_REQUEST);
         }
+
+        log.warn("운영 시간 조회");
     }
 
     // RelayURL 변경  
@@ -159,6 +165,8 @@ public class EventService {
             log.error("Event Relay URL 변경 실패 - Event ID : {}", event.getId());
             throw new CommonException("Set-Relay-Url", HttpStatus.BAD_REQUEST);
         }
+
+        log.warn("Relay URL 변경 - 변경된 URL : {}", event.getRelayUrl());
     }
 
     // 데이터 로드용  
@@ -171,12 +179,13 @@ public class EventService {
             recycleFn.autoUpdateStatus(event);
             recycleFn.validateOperationTime(event);
             eventRepository.save(event);
-            log.info("Event 객체 데이터 로드 완료 - Event ID : {}", event.getId());
             template.convertAndSend("/count/data", event);
         } catch (Exception e) {
             log.error("Event 객체 데이터 로드 실패", e);
             throw new CommonException("Get-Init-Data", HttpStatus.BAD_REQUEST);
         }
+
+        log.info("Event 객체 데이터 로드 완료 - Event ID : {}", event.getId());
     }
 }
 ```
