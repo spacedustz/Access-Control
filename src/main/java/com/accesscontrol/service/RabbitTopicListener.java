@@ -8,6 +8,9 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -117,9 +120,24 @@ public class RabbitTopicListener {
     public void requestApi(Event event) {
         // URL 설정
         String url = event.getRelayUrl();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64" + " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+        HttpEntity<String> httpEntity = new HttpEntity<String>("", headers);
 
         // 요청 보내기
-        restTemplate.getForEntity(url, Void.class);
+
+        try {
+            restTemplate.exchange(url, HttpMethod.GET, httpEntity, Void.class);
+            log.warn("Door API 1 - OPEN");
+        } catch (Exception e1) {
+            log.error("Door API 1 Error : {}", e1.getMessage());
+            try {
+                restTemplate.getForEntity(url, Void.class);
+                log.warn("Door API 2 - Open");
+            } catch (Exception e2) {
+                log.error("Door API Error : {}", e2.getMessage());
+            }
+        }
     }
 
     public void addData() throws Exception {
