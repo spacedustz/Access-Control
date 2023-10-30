@@ -1,10 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+
     <!-- 변수 지정 -->
+    <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%5p){TRACE=white,DEBUG=cyan,INFO=green,WARN=orange,ERROR=red} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){blue} %clr(:){faint} %m%n%wex"/>
     <property name="LOG_DIR" value="E:\Data\Log\Access-Control" />
-    <property name="LOG_PATH_NAME" value="${LOG_DIR}/log.log" />
+    <property name="LOG_PATH_NAME" value="${LOG_DIR}/hls.log" />
 
     <!-- FILE Appender -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -20,19 +25,12 @@
     </appender>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\) : %m%n</pattern>
-        </layout>
-    </appender>
-
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-<!--            <pattern>%-5level %d{yy-MM-dd HH:mm:ss}[%thread] [%logger{0}:%line] - %msg%n</pattern>-->
-            <pattern>%d{yy-MM-dd HH:mm:ss} %highlight(%-5level) [%thread] %cyan(%logger{0}.%M\(%line\)) - %msg%n%rEx</pattern>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
     </appender>
-    <root level="WARN">
-        <appender-ref ref="CONSOLE" />
+
+    <root level="DEBUG">
         <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </root>
