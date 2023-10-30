@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 public class RecycleFn {
     private final EventRepository eventRepository;
     private final SimpMessagingTemplate template;
-    private String currentDate = String.valueOf(LocalDate.now());
+//    private String currentDate = String.valueOf(LocalDate.now());
 
     @Transactional(readOnly = true)
     public Long getEntityCount() {
@@ -138,9 +138,9 @@ public class RecycleFn {
                                         Event event) {
 
         // 이벤트 데이터의 날짜 검증
-        if (!eventYMDDate.equals(currentDate) || (!entityYMDDate.equals(currentDate))) {
-            log.warn("데이터의 날짜가 오늘 날짜가 아닙니다. - 현재 날짜 : {}, 데이터의 날짜 : {}", currentDate, eventYMDDate);
-        }
+//        if (!eventYMDDate.equals(currentDate) || (!entityYMDDate.equals(currentDate))) {
+//            log.warn("데이터의 날짜가 오늘 날짜가 아닙니다. - 현재 날짜 : {}, 데이터의 날짜 : {}", currentDate, eventYMDDate);
+//        }
 
         // 이벤트 데이터의 운영 시간 검증
         if (!eventDateTime.isAfter(open) && !eventDateTime.isBefore(close)) {
