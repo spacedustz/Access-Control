@@ -57,16 +57,16 @@ public class RabbitTopicListener {
         // 원본 데이터의 system_date 필드 변환
         String originalDate = message.getSystem_date();
         DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss yyyy", Locale.ENGLISH);
-        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss yyyy", Locale.ENGLISH);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("EEE MMM  d HH:mm:ss yyyy", Locale.ENGLISH);
         LocalDateTime convertedDate = null;
 
         try {
-            convertedDate = LocalDateTime.parse(openTime, formatter1);
+            convertedDate = LocalDateTime.parse(originalDate, formatter1);
         } catch (Exception e1) {
             try {
                 convertedDate = LocalDateTime.parse(originalDate, formatter2);
             } catch (Exception e2) {
-                log.error("날짜 형식이 두 케이스 모두 일치하지 않습니다.");
+                log.error("날짜 형식이 두 케이스 모두 일치하지 않습니다. {}", originalDate);
             }
         }
 
