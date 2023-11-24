@@ -80,9 +80,9 @@ public class InstanceMonitoringThread extends Thread {
     }
 
     private void monitoringInstanceConnection() {
-        executor.execute(() -> {
-            InstanceMonitoringThread instanceThread = new InstanceMonitoringThread(executor, webClient, mapper);
-            executor.execute(instanceThread);
+        this.setUncaughtExceptionHandler((t, e) -> {
+            log.error("{} Thread 내부에 치명적인 에러 발생 - {}", Thread.currentThread().getName(), e.getMessage());
         });
+        executor.execute(this);
     }
 }
